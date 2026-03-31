@@ -118,24 +118,58 @@
     </section>
 
     <div class="stage">
-      <div class="canvas-panel">
-        <button id="prevBtn" class="canvas-nav canvas-nav-prev" type="button" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="m14.5 5.5-7 6.5 7 6.5"></path>
-          </svg>
-          <span class="visually-hidden" data-i18n="previous">Previous</span>
-        </button>
-        <button id="nextBtn" class="canvas-nav canvas-nav-next" type="button" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="m9.5 5.5 7 6.5-7 6.5"></path>
-          </svg>
-          <span class="visually-hidden" data-i18n="next">Next</span>
-        </button>
-        <div class="canvas-meta">
-          <span class="canvas-badge" id="photoPositionBadge" hidden></span>
+      <div class="workspace-column">
+        <div class="canvas-panel">
+          <button id="prevBtn" class="canvas-nav canvas-nav-prev" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m14.5 5.5-7 6.5 7 6.5"></path>
+            </svg>
+            <span class="visually-hidden" data-i18n="previous">Previous</span>
+          </button>
+          <button id="nextBtn" class="canvas-nav canvas-nav-next" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m9.5 5.5 7 6.5-7 6.5"></path>
+            </svg>
+            <span class="visually-hidden" data-i18n="next">Next</span>
+          </button>
+          <div class="canvas-meta">
+            <span class="canvas-badge" id="photoPositionBadge" hidden></span>
+          </div>
+          <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="editorCanvas" width="800" height="500"></canvas>
+          </div>
         </div>
-        <div class="canvas-wrap" id="canvasWrap">
-          <canvas id="editorCanvas" width="800" height="500"></canvas>
+
+        <div class="utility-panels">
+          <section class="tool-section tool-section-boxes">
+            <h2 data-i18n="groupBoxes">Boxes</h2>
+            <div class="tool-actions">
+              <button id="addBoxBtn" type="button" disabled data-i18n="addBox">Add Box</button>
+              <button id="deleteBoxBtn" class="icon-button danger-button" type="button" disabled>
+                <span class="button-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4.5 7.5h15"></path>
+                    <path d="M9.5 7.5V5.5h5v2"></path>
+                    <path d="M8 7.5v10.5"></path>
+                    <path d="M12 7.5v10.5"></path>
+                    <path d="M16 7.5v10.5"></path>
+                    <path d="M6 7.5l1 12h10l1-12"></path>
+                  </svg>
+                </span>
+                <span data-i18n="deleteBox">Clear Selected Box</span>
+              </button>
+              <button id="clearBoxesBtn" type="button" disabled data-i18n="clearBoxes">Clear All Boxes</button>
+            </div>
+            <div class="box-list" id="boxList"></div>
+          </section>
+
+          <section class="tool-section tool-section-export">
+            <h2 data-i18n="groupExport">Export</h2>
+            <div class="tool-actions">
+              <button id="saveBtn" type="button" disabled data-i18n="saveCopy">Save Copy</button>
+              <button id="saveAllBtn" type="button" disabled data-i18n="saveAll">Save All</button>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -166,36 +200,6 @@
           <div class="tool-actions">
             <button id="autoDetectBtn" type="button" disabled data-i18n="autoDetect">Auto Detect</button>
             <button id="autoDetectAllBtn" type="button" disabled data-i18n="autoDetectAll">Auto Detect All</button>
-          </div>
-        </section>
-
-        <section class="tool-section">
-          <h2 data-i18n="groupBoxes">Boxes</h2>
-          <div class="tool-actions">
-            <button id="addBoxBtn" type="button" disabled data-i18n="addBox">Add Box</button>
-            <button id="deleteBoxBtn" class="icon-button danger-button" type="button" disabled>
-              <span class="button-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4.5 7.5h15"></path>
-                  <path d="M9.5 7.5V5.5h5v2"></path>
-                  <path d="M8 7.5v10.5"></path>
-                  <path d="M12 7.5v10.5"></path>
-                  <path d="M16 7.5v10.5"></path>
-                  <path d="M6 7.5l1 12h10l1-12"></path>
-                </svg>
-              </span>
-              <span data-i18n="deleteBox">Clear Selected Box</span>
-            </button>
-            <button id="clearBoxesBtn" type="button" disabled data-i18n="clearBoxes">Clear All Boxes</button>
-          </div>
-          <div class="box-list" id="boxList"></div>
-        </section>
-
-        <section class="tool-section">
-          <h2 data-i18n="groupExport">Export</h2>
-          <div class="tool-actions">
-            <button id="saveBtn" type="button" disabled data-i18n="saveCopy">Save Copy</button>
-            <button id="saveAllBtn" type="button" disabled data-i18n="saveAll">Save All</button>
           </div>
         </section>
       </div>
