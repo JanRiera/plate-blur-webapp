@@ -387,6 +387,7 @@ const runtimeAssetBaseUrl = new URL('./vendor/onnxruntime-web/', applicationBase
 const elements = {
   input: document.getElementById('photoInput'),
   photoSelectionSummary: document.getElementById('photoSelectionSummary'),
+  photoPositionBadge: document.getElementById('photoPositionBadge'),
   autoDetect: document.getElementById('autoDetectBtn'),
   autoDetectAll: document.getElementById('autoDetectAllBtn'),
   addBox: document.getElementById('addBoxBtn'),
@@ -399,8 +400,8 @@ const elements = {
   removePhoto: document.getElementById('removePhotoBtn'),
   status: document.getElementById('status'),
   language: document.getElementById('languageSelect'),
-  themeLight: document.getElementById('themeLightBtn'),
-  themeDark: document.getElementById('themeDarkBtn'),
+  themeToggle: document.getElementById('themeToggleBtn'),
+  themeToggleText: document.getElementById('themeToggleText'),
   mode: document.getElementById('redactionMode'),
   blurSlider: document.getElementById('blurSlider'),
   zoomSlider: document.getElementById('zoomSlider'),
@@ -528,13 +529,9 @@ function applyTheme() {
   document.documentElement.dataset.theme = currentTheme;
 }
 
-function updateThemeButtons() {
-  [elements.themeLight, elements.themeDark].forEach(themeButton => {
-    const themeValue = themeButton === elements.themeDark ? 'dark' : 'light';
-    const isActive = currentTheme === themeValue;
-    themeButton.classList.toggle('active', isActive);
-    themeButton.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-  });
+function updateThemeToggle() {
+  elements.themeToggle.setAttribute('aria-pressed', currentTheme === 'dark' ? 'true' : 'false');
+  elements.themeToggleText.textContent = translate(currentTheme === 'dark' ? 'themeDark' : 'themeLight');
 }
 
 function refreshStatus() {
@@ -556,11 +553,12 @@ function updateStaticText() {
     element.textContent = translate(element.dataset.i18n);
   });
   applyTheme();
-  updateThemeButtons();
+  updateThemeToggle();
   updateLanguageSelectorOptions();
   elements.language.value = currentLanguage;
   elements.mode.value = redactionMode;
   updatePhotoSelectionSummary();
+  updatePhotoPositionBadge();
   updateBoxList();
   refreshStatus();
 }
@@ -575,7 +573,7 @@ function setTheme(themeValue) {
   currentTheme = themeValue === 'dark' ? 'dark' : 'light';
   writeStoredValue(storageKeys.theme, currentTheme);
   applyTheme();
-  updateThemeButtons();
+  updateThemeToggle();
 }
 
 function createUniqueId() {
@@ -747,6 +745,16 @@ function updatePhotoSelectionSummary() {
   });
 }
 
+function updatePhotoPositionBadge() {
+  if (!originalImage || batchImages.length <= 1) {
+    elements.photoPositionBadge.hidden = true;
+    elements.photoPositionBadge.textContent = '';
+    return;
+  }
+  elements.photoPositionBadge.hidden = false;
+  elements.photoPositionBadge.textContent = `${currentIndex + 1} / ${batchImages.length}`;
+}
+
 function setBusyState(nextBusyState) {
   isBusy = nextBusyState;
   document.body.dataset.busy = nextBusyState ? 'true' : 'false';
@@ -770,8 +778,7 @@ function updateControls() {
     elements.blurSlider.disabled = true;
     elements.zoomSlider.disabled = true;
     elements.language.disabled = false;
-    elements.themeLight.disabled = false;
-    elements.themeDark.disabled = false;
+    elements.themeToggle.disabled = false;
     return;
   }
   const hasImage = Boolean(originalImage);
@@ -791,8 +798,7 @@ function updateControls() {
   elements.blurSlider.disabled = !hasImage || isBusy || redactionMode !== 'blur';
   elements.zoomSlider.disabled = !hasImage;
   elements.language.disabled = false;
-  elements.themeLight.disabled = false;
-  elements.themeDark.disabled = false;
+  elements.themeToggle.disabled = false;
 }
 
 function updateBoxList() {
@@ -1081,6 +1087,7 @@ async function loadFile(file, options = {}) {
     }
     hoverHandle = null;
     hoveredShape = null;
+    updatePhotoPositionBadge();
     updateControls();
     updateBoxList();
     fitToViewport();
@@ -1100,6 +1107,7 @@ async function loadFile(file, options = {}) {
     originalImage = null;
     shapes = [];
     selectedId = null;
+    updatePhotoPositionBadge();
     updateControls();
     updateBoxList();
     resetCanvas();
@@ -1432,6 +1440,7 @@ function resetEditorForEmptyBatch() {
   hoverHandle = null;
   hoveredShape = null;
   updatePhotoSelectionSummary();
+  updatePhotoPositionBadge();
   updateControls();
   updateBoxList();
   resetCanvas();
@@ -1706,12 +1715,8 @@ elements.language.addEventListener('change', event => {
   setLanguage(event.target.value);
 });
 
-elements.themeLight.addEventListener('click', () => {
-  setTheme('light');
-});
-
-elements.themeDark.addEventListener('click', () => {
-  setTheme('dark');
+elements.themeToggle.addEventListener('click', () => {
+  setTheme(currentTheme === 'dark' ? 'light' : 'dark');
 });
 
 elements.mode.addEventListener('change', async () => {
