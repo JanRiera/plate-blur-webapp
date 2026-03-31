@@ -15,7 +15,15 @@ const translations = {
     previous: 'Previous',
     next: 'Next',
     removePhoto: 'Remove Photo',
+    groupPhotos: 'Photos',
+    groupNavigation: 'Navigation',
+    groupDetection: 'Detection',
+    groupBoxes: 'Boxes',
+    groupExport: 'Export',
     language: 'Language',
+    theme: 'Theme',
+    themeLight: 'Light',
+    themeDark: 'Dark',
     languageNameEnglish: 'English',
     languageNameJapanese: 'Japanese',
     languageNameSpanish: 'Spanish',
@@ -80,7 +88,15 @@ const translations = {
     previous: '前へ',
     next: '次へ',
     removePhoto: '写真を削除',
+    groupPhotos: '写真',
+    groupNavigation: '移動',
+    groupDetection: '検出',
+    groupBoxes: 'ボックス',
+    groupExport: '保存',
     language: '言語',
+    theme: 'テーマ',
+    themeLight: 'ライト',
+    themeDark: 'ダーク',
     languageNameEnglish: '英語',
     languageNameJapanese: '日本語',
     languageNameSpanish: 'スペイン語',
@@ -145,7 +161,15 @@ const translations = {
     previous: 'Anterior',
     next: 'Siguiente',
     removePhoto: 'Eliminar foto',
+    groupPhotos: 'Fotos',
+    groupNavigation: 'Navegacion',
+    groupDetection: 'Deteccion',
+    groupBoxes: 'Cuadros',
+    groupExport: 'Exportacion',
     language: 'Idioma',
+    theme: 'Tema',
+    themeLight: 'Claro',
+    themeDark: 'Oscuro',
     languageNameEnglish: 'Inglés',
     languageNameJapanese: 'Japonés',
     languageNameSpanish: 'Español',
@@ -210,7 +234,15 @@ const translations = {
     previous: 'Precedente',
     next: 'Successiva',
     removePhoto: 'Rimuovi foto',
+    groupPhotos: 'Foto',
+    groupNavigation: 'Navigazione',
+    groupDetection: 'Rilevamento',
+    groupBoxes: 'Riquadri',
+    groupExport: 'Esportazione',
     language: 'Lingua',
+    theme: 'Tema',
+    themeLight: 'Chiaro',
+    themeDark: 'Scuro',
     languageNameEnglish: 'Inglese',
     languageNameJapanese: 'Giapponese',
     languageNameSpanish: 'Spagnolo',
@@ -275,7 +307,15 @@ const translations = {
     previous: 'Zurück',
     next: 'Weiter',
     removePhoto: 'Foto entfernen',
+    groupPhotos: 'Fotos',
+    groupNavigation: 'Navigation',
+    groupDetection: 'Erkennung',
+    groupBoxes: 'Rahmen',
+    groupExport: 'Export',
     language: 'Sprache',
+    theme: 'Thema',
+    themeLight: 'Hell',
+    themeDark: 'Dunkel',
     languageNameEnglish: 'Englisch',
     languageNameJapanese: 'Japanisch',
     languageNameSpanish: 'Spanisch',
@@ -336,6 +376,7 @@ const languageOptionKeys = {
 };
 const storageKeys = {
   language: 'plateBlurLanguage',
+  theme: 'plateBlurTheme',
   session: 'plateBlurSession'
 };
 const applicationBaseUrl = new URL('./', import.meta.url);
@@ -358,6 +399,8 @@ const elements = {
   removePhoto: document.getElementById('removePhotoBtn'),
   status: document.getElementById('status'),
   language: document.getElementById('languageSelect'),
+  themeLight: document.getElementById('themeLightBtn'),
+  themeDark: document.getElementById('themeDarkBtn'),
   mode: document.getElementById('redactionMode'),
   blurSlider: document.getElementById('blurSlider'),
   zoomSlider: document.getElementById('zoomSlider'),
@@ -389,6 +432,7 @@ const browserSupported = Boolean(
 );
 
 let currentLanguage = getInitialLanguage();
+let currentTheme = getInitialTheme();
 let currentStatusKey = 'statusSelectPhoto';
 let currentStatusValues = {};
 let currentStatusTone = 'info';
@@ -459,6 +503,10 @@ function getInitialLanguage() {
   return normalizeLanguageCode(navigator.language || 'en');
 }
 
+function getInitialTheme() {
+  return readStoredValue(storageKeys.theme) === 'dark' ? 'dark' : 'light';
+}
+
 function translate(translationKey, values = {}) {
   const selectedTranslations = translations[currentLanguage] || translations.en;
   const template = selectedTranslations[translationKey] ?? translations.en[translationKey] ?? translationKey;
@@ -473,6 +521,19 @@ function translate(translationKey, values = {}) {
 function updateLanguageSelectorOptions() {
   Array.from(elements.language.options).forEach(option => {
     option.textContent = translate(languageOptionKeys[option.value]);
+  });
+}
+
+function applyTheme() {
+  document.documentElement.dataset.theme = currentTheme;
+}
+
+function updateThemeButtons() {
+  [elements.themeLight, elements.themeDark].forEach(themeButton => {
+    const themeValue = themeButton === elements.themeDark ? 'dark' : 'light';
+    const isActive = currentTheme === themeValue;
+    themeButton.classList.toggle('active', isActive);
+    themeButton.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 
@@ -494,6 +555,8 @@ function updateStaticText() {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     element.textContent = translate(element.dataset.i18n);
   });
+  applyTheme();
+  updateThemeButtons();
   updateLanguageSelectorOptions();
   elements.language.value = currentLanguage;
   elements.mode.value = redactionMode;
@@ -506,6 +569,13 @@ function setLanguage(languageCode) {
   currentLanguage = normalizeLanguageCode(languageCode);
   writeStoredValue(storageKeys.language, currentLanguage);
   updateStaticText();
+}
+
+function setTheme(themeValue) {
+  currentTheme = themeValue === 'dark' ? 'dark' : 'light';
+  writeStoredValue(storageKeys.theme, currentTheme);
+  applyTheme();
+  updateThemeButtons();
 }
 
 function createUniqueId() {
@@ -700,6 +770,8 @@ function updateControls() {
     elements.blurSlider.disabled = true;
     elements.zoomSlider.disabled = true;
     elements.language.disabled = false;
+    elements.themeLight.disabled = false;
+    elements.themeDark.disabled = false;
     return;
   }
   const hasImage = Boolean(originalImage);
@@ -719,6 +791,8 @@ function updateControls() {
   elements.blurSlider.disabled = !hasImage || isBusy || redactionMode !== 'blur';
   elements.zoomSlider.disabled = !hasImage;
   elements.language.disabled = false;
+  elements.themeLight.disabled = false;
+  elements.themeDark.disabled = false;
 }
 
 function updateBoxList() {
@@ -1630,6 +1704,14 @@ elements.input.addEventListener('change', async event => {
 
 elements.language.addEventListener('change', event => {
   setLanguage(event.target.value);
+});
+
+elements.themeLight.addEventListener('click', () => {
+  setTheme('light');
+});
+
+elements.themeDark.addEventListener('click', () => {
+  setTheme('dark');
 });
 
 elements.mode.addEventListener('change', async () => {

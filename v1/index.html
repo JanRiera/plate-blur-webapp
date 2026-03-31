@@ -8,34 +8,77 @@
 </head>
 <body>
   <main class="wrap">
-    <h1 data-i18n="appTitle">Plate Blur Prototype</h1>
-    <div class="toolbar">
-      <label class="file-picker" for="photoInput">
-        <span data-i18n="uploadPhotos">Choose Photos</span>
-      </label>
-      <input id="photoInput" class="visually-hidden" type="file" accept="image/*" multiple />
-      <span class="muted toolbar-summary" id="photoSelectionSummary" data-i18n="photoSelectionEmpty">No photos selected.</span>
-      <button id="autoDetectBtn" type="button" disabled data-i18n="autoDetect">Auto Detect</button>
-      <button id="autoDetectAllBtn" type="button" disabled data-i18n="autoDetectAll">Auto Detect All</button>
-      <button id="addBoxBtn" type="button" disabled data-i18n="addBox">Add Box</button>
-      <button id="clearBoxesBtn" type="button" disabled data-i18n="clearBoxes">Clear All Boxes</button>
-      <button id="deleteBoxBtn" type="button" disabled data-i18n="deleteBox">Clear Selected Box</button>
-      <button id="saveBtn" type="button" disabled data-i18n="saveCopy">Save Copy</button>
-      <button id="saveAllBtn" type="button" disabled data-i18n="saveAll">Save All</button>
-      <button id="prevBtn" type="button" disabled data-i18n="previous">Previous</button>
-      <button id="nextBtn" type="button" disabled data-i18n="next">Next</button>
-      <button id="removePhotoBtn" type="button" disabled data-i18n="removePhoto">Remove Photo</button>
-      <div class="language-group">
-        <label for="languageSelect" data-i18n="language">Language</label>
-        <select id="languageSelect">
-          <option value="en">English</option>
-          <option value="ja">Japanese</option>
-          <option value="es">Spanish</option>
-          <option value="it">Italian</option>
-          <option value="de">German</option>
-        </select>
+    <header class="app-header">
+      <div class="app-topbar">
+        <h1 data-i18n="appTitle">Plate Blur Prototype</h1>
+        <div class="preferences-panel">
+          <div class="setting-group">
+            <span class="setting-label" data-i18n="theme">Theme</span>
+            <div class="segmented-control" role="group" aria-label="Theme">
+              <button id="themeLightBtn" class="segment-button" type="button" data-i18n="themeLight">Light</button>
+              <button id="themeDarkBtn" class="segment-button" type="button" data-i18n="themeDark">Dark</button>
+            </div>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label" for="languageSelect" data-i18n="language">Language</label>
+            <select id="languageSelect">
+              <option value="en">English</option>
+              <option value="ja">Japanese</option>
+              <option value="es">Spanish</option>
+              <option value="it">Italian</option>
+              <option value="de">German</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <span class="status muted" id="status" aria-live="polite" data-tone="info" data-i18n="statusSelectPhoto">Select a photo to begin.</span>
+      <p class="status-banner" id="status" aria-live="polite" data-tone="info" data-i18n="statusSelectPhoto">Select a photo to begin.</p>
+    </header>
+
+    <div class="toolbar-grid">
+      <section class="toolbar-section toolbar-section-photos">
+        <h2 class="toolbar-title" data-i18n="groupPhotos">Photos</h2>
+        <div class="toolbar-actions">
+          <label class="file-picker" for="photoInput">
+            <span data-i18n="uploadPhotos">Choose Photos</span>
+          </label>
+          <input id="photoInput" class="visually-hidden" type="file" accept="image/*" multiple />
+          <button id="removePhotoBtn" type="button" disabled data-i18n="removePhoto">Remove Photo</button>
+        </div>
+        <div class="toolbar-summary muted" id="photoSelectionSummary" data-i18n="photoSelectionEmpty">No photos selected.</div>
+      </section>
+
+      <section class="toolbar-section">
+        <h2 class="toolbar-title" data-i18n="groupNavigation">Navigation</h2>
+        <div class="toolbar-actions toolbar-actions-paired">
+          <button id="prevBtn" type="button" disabled data-i18n="previous">Previous</button>
+          <button id="nextBtn" type="button" disabled data-i18n="next">Next</button>
+        </div>
+      </section>
+
+      <section class="toolbar-section">
+        <h2 class="toolbar-title" data-i18n="groupDetection">Detection</h2>
+        <div class="toolbar-actions">
+          <button id="autoDetectBtn" type="button" disabled data-i18n="autoDetect">Auto Detect</button>
+          <button id="autoDetectAllBtn" type="button" disabled data-i18n="autoDetectAll">Auto Detect All</button>
+        </div>
+      </section>
+
+      <section class="toolbar-section">
+        <h2 class="toolbar-title" data-i18n="groupBoxes">Boxes</h2>
+        <div class="toolbar-actions">
+          <button id="addBoxBtn" type="button" disabled data-i18n="addBox">Add Box</button>
+          <button id="deleteBoxBtn" type="button" disabled data-i18n="deleteBox">Clear Selected Box</button>
+          <button id="clearBoxesBtn" type="button" disabled data-i18n="clearBoxes">Clear All Boxes</button>
+        </div>
+      </section>
+
+      <section class="toolbar-section">
+        <h2 class="toolbar-title" data-i18n="groupExport">Export</h2>
+        <div class="toolbar-actions">
+          <button id="saveBtn" type="button" disabled data-i18n="saveCopy">Save Copy</button>
+          <button id="saveAllBtn" type="button" disabled data-i18n="saveAll">Save All</button>
+        </div>
+      </section>
     </div>
 
     <div class="stage">
