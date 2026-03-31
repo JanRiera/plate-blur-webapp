@@ -496,11 +496,11 @@ function writeStoredValue(storageKey, storageValue) {
 }
 
 function getInitialLanguage() {
-  const storedLanguage = normalizeLanguageCode(readStoredValue(storageKeys.language));
-  if (storedLanguage !== 'en' || readStoredValue(storageKeys.language) === 'en') {
-    return storedLanguage;
+  const storedLanguage = readStoredValue(storageKeys.language);
+  if (typeof storedLanguage === 'string' && storedLanguage) {
+    return normalizeLanguageCode(storedLanguage);
   }
-  return normalizeLanguageCode(navigator.language || 'en');
+  return 'en';
 }
 
 function getInitialTheme() {
