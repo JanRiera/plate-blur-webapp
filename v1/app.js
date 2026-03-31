@@ -367,12 +367,12 @@ const translations = {
 };
 
 const supportedLanguageCodes = ['en', 'ja', 'es', 'it', 'de'];
-const languageOptionKeys = {
-  en: 'languageNameEnglish',
-  ja: 'languageNameJapanese',
-  es: 'languageNameSpanish',
-  it: 'languageNameItalian',
-  de: 'languageNameGerman'
+const languagePresentation = {
+  en: { flag: '🇬🇧', label: 'English' },
+  ja: { flag: '🇯🇵', label: '日本語' },
+  es: { flag: '🇪🇸', label: 'Español' },
+  it: { flag: '🇮🇹', label: 'Italiano' },
+  de: { flag: '🇩🇪', label: 'Deutsch' }
 };
 const storageKeys = {
   language: 'plateBlurLanguage',
@@ -399,7 +399,11 @@ const elements = {
   next: document.getElementById('nextBtn'),
   removePhoto: document.getElementById('removePhotoBtn'),
   status: document.getElementById('status'),
-  language: document.getElementById('languageSelect'),
+  languageMenu: document.getElementById('languageMenu'),
+  languageToggle: document.getElementById('languageMenuButton'),
+  languageCurrentFlag: document.getElementById('languageCurrentFlag'),
+  languageCurrentLabel: document.getElementById('languageCurrentLabel'),
+  languageOptions: Array.from(document.querySelectorAll('[data-language-option]')),
   themeToggle: document.getElementById('themeToggleBtn'),
   themeToggleText: document.getElementById('themeToggleText'),
   mode: document.getElementById('redactionMode'),
@@ -519,10 +523,59 @@ function translate(translationKey, values = {}) {
   });
 }
 
-function updateLanguageSelectorOptions() {
-  Array.from(elements.language.options).forEach(option => {
-    option.textContent = translate(languageOptionKeys[option.value]);
+function getLanguagePresentation(languageCode) {
+  return languagePresentation[normalizeLanguageCode(languageCode)] || languagePresentation.en;
+}
+
+function isLanguageMenuOpen() {
+  return elements.languageMenu.dataset.open === 'true';
+}
+
+function closeLanguageMenu() {
+  elements.languageMenu.dataset.open = 'false';
+  elements.languageToggle.setAttribute('aria-expanded', 'false');
+  updateLanguageMenu();
+}
+
+function openLanguageMenu(options = {}) {
+  const { focusSelectedOption = false } = options;
+  if (elements.languageToggle.disabled) {
+    return;
+  }
+  updateLanguageMenu();
+  elements.languageMenu.dataset.open = 'true';
+  elements.languageToggle.setAttribute('aria-expanded', 'true');
+  if (focusSelectedOption) {
+    queueMicrotask(() => {
+      const selectedOption = elements.languageOptions.find(option => option.dataset.languageOption === currentLanguage) || elements.languageOptions[0];
+      selectedOption?.focus();
+    });
+  }
+}
+
+function updateLanguageMenu() {
+  const selectedLanguage = getLanguagePresentation(currentLanguage);
+  elements.languageCurrentFlag.textContent = selectedLanguage.flag;
+  elements.languageCurrentLabel.textContent = selectedLanguage.label;
+  elements.languageOptions.forEach(option => {
+    const isSelected = option.dataset.languageOption === currentLanguage;
+    option.dataset.selected = isSelected ? 'true' : 'false';
+    option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    option.tabIndex = isSelected ? 0 : -1;
   });
+}
+
+function focusLanguageOptionByIndex(targetIndex) {
+  const boundedIndex = clamp(targetIndex, 0, elements.languageOptions.length - 1);
+  elements.languageOptions[boundedIndex]?.focus();
+}
+
+function focusNextLanguageOption(step) {
+  const currentFocusIndex = elements.languageOptions.findIndex(option => option === document.activeElement);
+  const fallbackIndex = Math.max(0, supportedLanguageCodes.indexOf(currentLanguage));
+  const baseIndex = currentFocusIndex >= 0 ? currentFocusIndex : fallbackIndex;
+  const nextIndex = (baseIndex + step + elements.languageOptions.length) % elements.languageOptions.length;
+  focusLanguageOptionByIndex(nextIndex);
 }
 
 function applyTheme() {
@@ -554,8 +607,7 @@ function updateStaticText() {
   });
   applyTheme();
   updateThemeToggle();
-  updateLanguageSelectorOptions();
-  elements.language.value = currentLanguage;
+  updateLanguageMenu();
   elements.mode.value = redactionMode;
   updatePhotoSelectionSummary();
   updatePhotoPositionBadge();
@@ -566,6 +618,7 @@ function updateStaticText() {
 function setLanguage(languageCode) {
   currentLanguage = normalizeLanguageCode(languageCode);
   writeStoredValue(storageKeys.language, currentLanguage);
+  closeLanguageMenu();
   updateStaticText();
 }
 
@@ -777,7 +830,10 @@ function updateControls() {
     elements.mode.disabled = true;
     elements.blurSlider.disabled = true;
     elements.zoomSlider.disabled = true;
-    elements.language.disabled = false;
+    elements.languageToggle.disabled = false;
+    elements.languageOptions.forEach(option => {
+      option.disabled = false;
+    });
     elements.themeToggle.disabled = false;
     return;
   }
@@ -797,7 +853,10 @@ function updateControls() {
   elements.mode.disabled = !hasImage || isBusy;
   elements.blurSlider.disabled = !hasImage || isBusy || redactionMode !== 'blur';
   elements.zoomSlider.disabled = !hasImage;
-  elements.language.disabled = false;
+  elements.languageToggle.disabled = false;
+  elements.languageOptions.forEach(option => {
+    option.disabled = false;
+  });
   elements.themeToggle.disabled = false;
 }
 
@@ -1711,8 +1770,88 @@ elements.input.addEventListener('change', async event => {
   }
 });
 
-elements.language.addEventListener('change', event => {
-  setLanguage(event.target.value);
+elements.languageToggle.addEventListener('click', () => {
+  if (isLanguageMenuOpen()) {
+    closeLanguageMenu();
+    return;
+  }
+  openLanguageMenu();
+});
+
+elements.languageToggle.addEventListener('keydown', event => {
+  if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    openLanguageMenu({ focusSelectedOption: true });
+    return;
+  }
+  if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    openLanguageMenu({ focusSelectedOption: false });
+    focusLanguageOptionByIndex(elements.languageOptions.length - 1);
+  }
+});
+
+elements.languageOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    setLanguage(option.dataset.languageOption);
+  });
+
+  option.addEventListener('focus', () => {
+    elements.languageOptions.forEach(candidateOption => {
+      candidateOption.tabIndex = -1;
+    });
+    option.tabIndex = 0;
+  });
+
+  option.addEventListener('keydown', event => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      focusNextLanguageOption(1);
+      return;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      focusNextLanguageOption(-1);
+      return;
+    }
+    if (event.key === 'Home') {
+      event.preventDefault();
+      focusLanguageOptionByIndex(0);
+      return;
+    }
+    if (event.key === 'End') {
+      event.preventDefault();
+      focusLanguageOptionByIndex(elements.languageOptions.length - 1);
+      return;
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeLanguageMenu();
+      elements.languageToggle.focus();
+      return;
+    }
+    if (event.key === 'Tab') {
+      closeLanguageMenu();
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setLanguage(option.dataset.languageOption);
+    }
+  });
+});
+
+document.addEventListener('pointerdown', event => {
+  if (!(event.target instanceof Node) || !elements.languageMenu.contains(event.target)) {
+    closeLanguageMenu();
+  }
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && isLanguageMenuOpen()) {
+    closeLanguageMenu();
+    elements.languageToggle.focus();
+  }
 });
 
 elements.themeToggle.addEventListener('click', () => {

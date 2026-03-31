@@ -35,14 +35,49 @@
             </button>
           </div>
           <div class="setting-group">
-            <label class="setting-label" for="languageSelect" data-i18n="language">Language</label>
-            <select id="languageSelect">
-              <option value="en">English</option>
-              <option value="ja">Japanese</option>
-              <option value="es">Spanish</option>
-              <option value="it">Italian</option>
-              <option value="de">German</option>
-            </select>
+            <span class="setting-label" id="languageMenuLabel" data-i18n="language">Language</span>
+            <div class="language-menu" id="languageMenu" data-open="false">
+              <button
+                id="languageMenuButton"
+                class="language-menu-button"
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-labelledby="languageMenuLabel languageCurrentLabel"
+              >
+                <span class="language-menu-current">
+                  <span class="language-option-flag" id="languageCurrentFlag" aria-hidden="true">🇬🇧</span>
+                  <span class="language-option-label" id="languageCurrentLabel">English</span>
+                </span>
+                <span class="language-menu-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6.5 9.5 5.5 5 5.5-5"></path>
+                  </svg>
+                </span>
+              </button>
+              <div class="language-menu-list" role="listbox" aria-labelledby="languageMenuLabel">
+                <button class="language-option" type="button" role="option" data-language-option="en">
+                  <span class="language-option-flag" aria-hidden="true">🇬🇧</span>
+                  <span class="language-option-label">English</span>
+                </button>
+                <button class="language-option" type="button" role="option" data-language-option="ja">
+                  <span class="language-option-flag" aria-hidden="true">🇯🇵</span>
+                  <span class="language-option-label">日本語</span>
+                </button>
+                <button class="language-option" type="button" role="option" data-language-option="es">
+                  <span class="language-option-flag" aria-hidden="true">🇪🇸</span>
+                  <span class="language-option-label">Español</span>
+                </button>
+                <button class="language-option" type="button" role="option" data-language-option="it">
+                  <span class="language-option-flag" aria-hidden="true">🇮🇹</span>
+                  <span class="language-option-label">Italiano</span>
+                </button>
+                <button class="language-option" type="button" role="option" data-language-option="de">
+                  <span class="language-option-flag" aria-hidden="true">🇩🇪</span>
+                  <span class="language-option-label">Deutsch</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
