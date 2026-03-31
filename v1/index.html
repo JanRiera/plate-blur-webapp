@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plate Blur Prototype</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1 data-i18n="appTitle">Plate Blur Prototype</h1>
+    <div class="toolbar">
+      <label class="file-picker" for="photoInput">
+        <span data-i18n="uploadPhotos">Choose Photos</span>
+      </label>
+      <input id="photoInput" class="visually-hidden" type="file" accept="image/*" multiple />
+      <span class="muted toolbar-summary" id="photoSelectionSummary" data-i18n="photoSelectionEmpty">No photos selected.</span>
+      <button id="autoDetectBtn" type="button" disabled data-i18n="autoDetect">Auto Detect</button>
+      <button id="autoDetectAllBtn" type="button" disabled data-i18n="autoDetectAll">Auto Detect All</button>
+      <button id="addBoxBtn" type="button" disabled data-i18n="addBox">Add Box</button>
+      <button id="clearBoxesBtn" type="button" disabled data-i18n="clearBoxes">Clear All Boxes</button>
+      <button id="deleteBoxBtn" type="button" disabled data-i18n="deleteBox">Clear Selected Box</button>
+      <button id="saveBtn" type="button" disabled data-i18n="saveCopy">Save Copy</button>
+      <button id="saveAllBtn" type="button" disabled data-i18n="saveAll">Save All</button>
+      <button id="prevBtn" type="button" disabled data-i18n="previous">Previous</button>
+      <button id="nextBtn" type="button" disabled data-i18n="next">Next</button>
+      <button id="removePhotoBtn" type="button" disabled data-i18n="removePhoto">Remove Photo</button>
+      <div class="language-group">
+        <label for="languageSelect" data-i18n="language">Language</label>
+        <select id="languageSelect">
+          <option value="en">English</option>
+          <option value="ja">Japanese</option>
+          <option value="es">Spanish</option>
+          <option value="it">Italian</option>
+          <option value="de">German</option>
+        </select>
+      </div>
+      <span class="status muted" id="status" aria-live="polite" data-tone="info" data-i18n="statusSelectPhoto">Select a photo to begin.</span>
+    </div>
+
+    <div class="stage">
+      <div class="canvas-panel">
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="editorCanvas" width="800" height="500"></canvas>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <h2 data-i18n="adjustments">Adjustments</h2>
+        <div class="field">
+          <label for="redactionMode" data-i18n="mode">Mode</label>
+          <select id="redactionMode" disabled>
+            <option value="blur" data-i18n="modeBlur">Blur</option>
+            <option value="amg" data-i18n="modeAmg">AMG Overlay</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="blurSlider" data-i18n="blurStrength">Blur strength</label>
+          <input id="blurSlider" type="range" min="4" max="40" step="1" value="16" disabled />
+        </div>
+        <div class="field">
+          <label for="zoomSlider" data-i18n="zoom">Zoom</label>
+          <input id="zoomSlider" type="range" min="25" max="200" step="5" value="100" disabled />
+        </div>
+        <div class="field muted" data-i18n="helpDragResize">Drag inside a box to move it. Drag a corner handle to resize it.</div>
+        <div class="field muted" data-i18n="helpReviewDetect">Auto-detect is only a rough prototype. Review every box before saving.</div>
+        <div class="box-list" id="boxList"></div>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
