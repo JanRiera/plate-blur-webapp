@@ -94,7 +94,7 @@ input[type="range"] {
 button,
 .file-picker,
 select {
-  min-height: 46px;
+  min-height: 48px;
   border: 1px solid var(--button-border);
   border-radius: 14px;
   background: var(--button-background);
@@ -453,6 +453,25 @@ html[data-theme="dark"] .theme-icon-moon {
   min-width: 0;
 }
 
+.mobile-primary-actions {
+  display: none;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  background: var(--panel-background);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(14px);
+  z-index: 4;
+}
+
+.mobile-primary-actions button {
+  width: 100%;
+  min-height: 52px;
+  justify-content: center;
+  font-weight: 700;
+}
+
 .canvas-panel {
   position: relative;
   min-height: 620px;
@@ -555,6 +574,7 @@ canvas {
 }
 
 .tool-section {
+  display: block;
   padding: 16px;
   border: 1px solid var(--panel-border);
   border-radius: 18px;
@@ -562,9 +582,60 @@ canvas {
   min-width: 0;
 }
 
+.tool-section-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.tool-section-summary::-webkit-details-marker {
+  display: none;
+}
+
+.tool-section-summary:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
 .tool-section h2 {
-  margin: 0 0 14px;
+  margin: 0;
   font-size: 16px;
+}
+
+.tool-section-content {
+  margin-top: 14px;
+}
+
+.tool-section-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--muted-color);
+  transition: transform 150ms ease;
+}
+
+.tool-section-chevron svg {
+  width: 100%;
+  height: 100%;
+}
+
+.collapsible-section[open] > .tool-section-summary .tool-section-chevron {
+  transform: rotate(180deg);
+}
+
+.collapsible-section[data-collapsible="false"] > .tool-section-summary {
+  cursor: default;
+  pointer-events: none;
+}
+
+.collapsible-section[data-collapsible="false"] > .tool-section-summary .tool-section-chevron {
+  display: none;
 }
 
 .field {
@@ -745,25 +816,44 @@ body[data-busy="true"] .file-picker {
     gap: 12px;
   }
 
+  .utility-panels,
+  .side-panel {
+    grid-template-columns: 1fr;
+  }
+
   .canvas-panel {
     min-height: 0;
     padding: 14px;
   }
 
   .canvas-wrap {
-    min-height: 400px;
-    max-height: 70vh;
-    padding: 42px 18px 82px;
+    min-height: 360px;
+    max-height: min(68svh, 640px);
+    padding: 34px 16px 78px;
   }
 
-  .side-panel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  body[data-mobile-actions="true"] .workspace-column {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+
+  body[data-mobile-actions="true"] .mobile-primary-actions {
+    position: sticky;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: -2px;
+  }
+
+  .mobile-primary-actions button {
+    font-size: 13.5px;
+    padding-inline: 10px;
+    line-height: 1.2;
   }
 }
 
 @media (max-width: 700px) {
-  .side-panel {
-    grid-template-columns: 1fr;
+  body[data-mobile-actions="true"] .mobile-primary-actions {
+    gap: 8px;
   }
 }
 
@@ -805,9 +895,9 @@ body[data-busy="true"] .file-picker {
   }
 
   .canvas-wrap {
-    min-height: 320px;
-    max-height: 68vh;
-    padding: 42px 10px 88px;
+    min-height: 300px;
+    max-height: min(62svh, 540px);
+    padding: 34px 10px 84px;
   }
 
   .canvas-nav {
@@ -879,10 +969,21 @@ body[data-busy="true"] .file-picker {
 
   .canvas-wrap {
     min-height: 280px;
-    padding: 40px 8px 84px;
+    max-height: min(58svh, 460px);
+    padding: 32px 8px 82px;
   }
 
   .tool-section {
     padding: 12px;
+  }
+
+  body[data-mobile-actions="true"] .mobile-primary-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 8px;
+  }
+
+  .mobile-primary-actions button {
+    min-height: 50px;
+    font-size: 12.5px;
   }
 }
