@@ -384,6 +384,9 @@ const overlayImageUrl = new URL('./assets/AMG-overlay.png', applicationBaseUrl).
 const modelFileUrl = new URL('./models/license-plate-finetune-v1s.onnx', applicationBaseUrl).href;
 const runtimeScriptUrl = new URL('./vendor/onnxruntime-web/ort.wasm.min.js', applicationBaseUrl).href;
 const runtimeAssetBaseUrl = new URL('./vendor/onnxruntime-web/', applicationBaseUrl).href;
+const mobileLayoutQuery = window.matchMedia('(max-width: 820px)');
+const coarsePointerQuery = window.matchMedia('(pointer: coarse)');
+const networkInformation = navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
 const elements = {
   input: document.getElementById('photoInput'),
   photoSelectionSummary: document.getElementById('photoSelectionSummary'),
@@ -411,7 +414,9 @@ const elements = {
   zoomSlider: document.getElementById('zoomSlider'),
   canvas: document.getElementById('editorCanvas'),
   canvasWrap: document.getElementById('canvasWrap'),
-  boxList: document.getElementById('boxList')
+  boxList: document.getElementById('boxList'),
+  mobilePrimaryActions: document.getElementById('mobilePrimaryActions'),
+  collapsibleSections: Array.from(document.querySelectorAll('.collapsible-section'))
 };
 const canvasContext = elements.canvas.getContext('2d');
 const blurSourceCanvas = document.createElement('canvas');
@@ -459,6 +464,7 @@ let isDragging = false;
 let isBusy = false;
 let latestLoadRequestId = 0;
 let blurCacheSignature = '';
+const primaryActionRestoreSlots = new Map();
 
 const overlayState = {
   image: null,
@@ -472,8 +478,27 @@ const runtimeState = {
 };
 const modelState = {
   session: null,
-  promise: null,
+  bytes: null,
   failed: false
+};
+const warmupState = {
+  queued: false,
+  started: false,
+  runtimePromise: null,
+  modelBytesPromise: null,
+  sessionPromise: null,
+  completed: false,
+  skippedReason: ''
+};
+const performanceMetrics = {
+  runtimeLoadMs: null,
+  modelFetchMs: null,
+  sessionCreateMs: null,
+  firstDetectMs: null
+};
+globalThis.__plateBlurDebug = {
+  warmupState,
+  performanceMetrics
 };
 
 function normalizeLanguageCode(languageCode) {
@@ -597,6 +622,159 @@ function setStatus(statusKey, values = {}, tone = 'info') {
   currentStatusValues = values;
   currentStatusTone = tone;
   refreshStatus();
+}
+
+function recordMetric(metricKey, durationMilliseconds) {
+  performanceMetrics[metricKey] = Number(durationMilliseconds.toFixed(1));
+}
+
+function isMobileLayout() {
+  return mobileLayoutQuery.matches;
+}
+
+function hasCoarsePointer() {
+  return coarsePointerQuery.matches;
+}
+
+function getViewportHeight() {
+  return window.visualViewport?.height || window.innerHeight;
+}
+
+function getHandleHitRadius() {
+  return (isMobileLayout() || hasCoarsePointer() ? 22 : 14) / Math.max(viewScale, 0.1);
+}
+
+function getHandleDrawRadius(isSelected) {
+  if (isMobileLayout() || hasCoarsePointer()) {
+    return isSelected ? 10 : 8.5;
+  }
+  return isSelected ? 7 : 6;
+}
+
+function setupPrimaryActionRestoreSlots() {
+  [elements.autoDetect, elements.addBox, elements.save].forEach(button => {
+    if (!button?.parentNode || primaryActionRestoreSlots.has(button.id)) {
+      return;
+    }
+    const restoreMarker = document.createComment(`${button.id}-restore-slot`);
+    button.parentNode.insertBefore(restoreMarker, button);
+    primaryActionRestoreSlots.set(button.id, restoreMarker);
+  });
+}
+
+function restorePrimaryActionButton(button) {
+  const restoreMarker = primaryActionRestoreSlots.get(button.id);
+  if (!restoreMarker?.parentNode) {
+    return;
+  }
+  restoreMarker.parentNode.insertBefore(button, restoreMarker.nextSibling);
+}
+
+function syncMobilePrimaryActions() {
+  if (!elements.mobilePrimaryActions) {
+    return;
+  }
+  const primaryButtons = [elements.autoDetect, elements.addBox, elements.save];
+  if (isMobileLayout()) {
+    primaryButtons.forEach(button => {
+      elements.mobilePrimaryActions.appendChild(button);
+    });
+    document.body.dataset.mobileActions = 'true';
+    return;
+  }
+  primaryButtons.forEach(restorePrimaryActionButton);
+  document.body.dataset.mobileActions = 'false';
+}
+
+function syncCollapsibleSections() {
+  elements.collapsibleSections.forEach(section => {
+    const summary = section.querySelector('.tool-section-summary');
+    if (!summary) {
+      return;
+    }
+    if (isMobileLayout()) {
+      section.dataset.collapsible = 'true';
+      const shouldOpen = (section.dataset.mobileOpen ?? section.dataset.mobileDefaultOpen ?? 'true') === 'true';
+      section.open = shouldOpen;
+      summary.tabIndex = 0;
+      return;
+    }
+    section.dataset.collapsible = 'false';
+    section.open = true;
+    summary.tabIndex = -1;
+  });
+}
+
+function getWarmupSkipReason() {
+  if (document.visibilityState !== 'visible') {
+    return 'hidden';
+  }
+  if (networkInformation?.saveData) {
+    return 'save-data';
+  }
+  const effectiveConnectionType = String(networkInformation?.effectiveType || '').toLowerCase();
+  if (effectiveConnectionType === 'slow-2g' || effectiveConnectionType === '2g') {
+    return effectiveConnectionType;
+  }
+  return '';
+}
+
+function startBackgroundWarmup() {
+  if (warmupState.started || warmupState.completed) {
+    return;
+  }
+  const skippedReason = getWarmupSkipReason();
+  if (skippedReason) {
+    warmupState.queued = false;
+    warmupState.skippedReason = skippedReason;
+    return;
+  }
+  warmupState.queued = false;
+  warmupState.started = true;
+  warmupState.skippedReason = '';
+  ensurePlateModel({ silent: true }).catch(error => {
+    console.error(error);
+    return null;
+  });
+}
+
+function scheduleAdaptiveWarmup() {
+  if (!browserSupported || warmupState.started || warmupState.completed || warmupState.queued) {
+    return;
+  }
+  const skippedReason = getWarmupSkipReason();
+  if (skippedReason) {
+    warmupState.skippedReason = skippedReason;
+    return;
+  }
+  warmupState.skippedReason = '';
+  warmupState.queued = true;
+  requestAnimationFrame(() => {
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(() => {
+        startBackgroundWarmup();
+      }, { timeout: 2500 });
+      return;
+    }
+    window.setTimeout(startBackgroundWarmup, 700);
+  });
+}
+
+function handleResponsiveLayoutChange() {
+  syncMobilePrimaryActions();
+  syncCollapsibleSections();
+  updateControls();
+  fitToViewport();
+}
+
+function addMediaQueryChangeListener(mediaQueryList, listener) {
+  if (typeof mediaQueryList.addEventListener === 'function') {
+    mediaQueryList.addEventListener('change', listener);
+    return;
+  }
+  if (typeof mediaQueryList.addListener === 'function') {
+    mediaQueryList.addListener(listener);
+  }
 }
 
 function updateStaticText() {
@@ -896,9 +1074,15 @@ function fitToViewport() {
   if (!originalImage) {
     return;
   }
-  const padding = 20;
-  const availableWidth = Math.max(200, elements.canvasWrap.clientWidth - padding);
-  const availableHeight = Math.max(320, window.innerHeight * 0.7);
+  const canvasPadding = isMobileLayout() ? 12 : 20;
+  const availableWidth = Math.max(200, elements.canvasWrap.clientWidth - canvasPadding);
+  const canvasWrapBounds = elements.canvasWrap.getBoundingClientRect();
+  const stickyActionsHeight = isMobileLayout() && document.body.dataset.mobileActions === 'true'
+    ? elements.mobilePrimaryActions?.getBoundingClientRect().height || 0
+    : 0;
+  const viewportHeightBudget = getViewportHeight() - canvasWrapBounds.top - stickyActionsHeight - 28;
+  const containerHeightBudget = elements.canvasWrap.clientHeight - canvasPadding;
+  const availableHeight = Math.max(240, Math.min(containerHeightBudget, viewportHeightBudget));
   fitScale = Math.min(availableWidth / originalImage.width, availableHeight / originalImage.height, 1);
   viewScale = fitScale * (Number(elements.zoomSlider.value) / 100);
   elements.canvas.width = Math.max(1, Math.round(originalImage.width * viewScale));
@@ -942,10 +1126,9 @@ function distance(firstPoint, secondPoint) {
 }
 
 function findHandle(targetPoint) {
-  const handleRadius = 12 / viewScale;
   for (const shape of [...shapes].reverse()) {
     for (let index = 0; index < shape.points.length; index += 1) {
-      if (distance(targetPoint, shape.points[index]) <= handleRadius) {
+      if (distance(targetPoint, shape.points[index]) <= getHandleHitRadius()) {
         return { shape, index };
       }
     }
@@ -1039,17 +1222,18 @@ function render() {
   });
   shapes.forEach(shape => {
     const isSelected = shape.id === selectedId;
+    const handleRadius = getHandleDrawRadius(isSelected);
     canvasContext.save();
     polygonPath(canvasContext, shape.points, viewScale);
-    canvasContext.lineWidth = isSelected ? 4 : 3;
+    canvasContext.lineWidth = isSelected ? 4.5 : 3.25;
     canvasContext.strokeStyle = isSelected ? '#2563eb' : '#ef4444';
     canvasContext.stroke();
     shape.points.forEach((pointValue, pointIndex) => {
       canvasContext.beginPath();
-      canvasContext.arc(pointValue.x * viewScale, pointValue.y * viewScale, isSelected ? 7 : 6, 0, Math.PI * 2);
+      canvasContext.arc(pointValue.x * viewScale, pointValue.y * viewScale, handleRadius, 0, Math.PI * 2);
       canvasContext.fillStyle = hoverHandle && hoverHandle.shape.id === shape.id && hoverHandle.index === pointIndex ? '#111827' : '#ffffff';
       canvasContext.fill();
-      canvasContext.lineWidth = 3;
+      canvasContext.lineWidth = isSelected ? 3.25 : 2.75;
       canvasContext.strokeStyle = isSelected ? '#2563eb' : '#ef4444';
       canvasContext.stroke();
     });
@@ -1224,14 +1408,30 @@ function loadScript(scriptUrl, attributeName) {
   });
 }
 
-async function ensureOrtRuntime() {
+async function ensureOrtRuntime(options = {}) {
+  const { silent = false } = options;
   if (runtimeState.ort) {
     return runtimeState.ort;
   }
   if (runtimeState.promise) {
-    return runtimeState.promise;
+    if (!silent) {
+      setStatus('statusLoadingRuntime', {}, 'loading');
+    }
+    try {
+      const ort = await runtimeState.promise;
+      if (!silent) {
+        setStatus('statusRuntimeReady', {}, 'ready');
+      }
+      return ort;
+    } catch (error) {
+      console.error(error);
+      if (!silent) {
+        setStatus('statusRuntimeFailed', {}, 'error');
+      }
+      throw error;
+    }
   }
-  setStatus('statusLoadingRuntime', {}, 'loading');
+  const runtimeStartedAt = performance.now();
   runtimeState.promise = loadScript(runtimeScriptUrl, 'data-onnxruntime-web')
     .then(() => {
       if (!window.ort) {
@@ -1244,49 +1444,110 @@ async function ensureOrtRuntime() {
         : 1;
       runtimeState.ort = window.ort;
       runtimeState.failed = false;
-      setStatus('statusRuntimeReady', {}, 'ready');
+      recordMetric('runtimeLoadMs', performance.now() - runtimeStartedAt);
       return runtimeState.ort;
     })
     .catch(error => {
-      console.error(error);
       runtimeState.failed = true;
-      setStatus('statusRuntimeFailed', {}, 'error');
       throw error;
     })
     .finally(() => {
       runtimeState.promise = null;
     });
-  return runtimeState.promise;
+  warmupState.runtimePromise = runtimeState.promise;
+  if (!silent) {
+    setStatus('statusLoadingRuntime', {}, 'loading');
+  }
+  try {
+    const ort = await warmupState.runtimePromise;
+    if (!silent) {
+      setStatus('statusRuntimeReady', {}, 'ready');
+    }
+    return ort;
+  } catch (error) {
+    console.error(error);
+    if (!silent) {
+      setStatus('statusRuntimeFailed', {}, 'error');
+    }
+    throw error;
+  }
 }
 
-async function ensurePlateModel() {
-  if (modelState.session) {
-    return modelState.session;
+async function fetchModelBytes() {
+  if (modelState.bytes) {
+    return modelState.bytes;
   }
-  if (modelState.promise) {
-    return modelState.promise;
+  if (warmupState.modelBytesPromise) {
+    return warmupState.modelBytesPromise;
   }
-  const ort = await ensureOrtRuntime();
-  setStatus('statusLoadingModel', {}, 'loading');
-  modelState.promise = ort.InferenceSession.create(modelFileUrl, {
-    executionProviders: ['wasm']
-  })
-    .then(session => {
-      modelState.session = session;
+  const modelFetchStartedAt = performance.now();
+  warmupState.modelBytesPromise = fetch(modelFileUrl, { cache: 'force-cache' })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`model-fetch-failed:${response.status}`);
+      }
+      return response.arrayBuffer();
+    })
+    .then(modelArrayBuffer => {
+      modelState.bytes = new Uint8Array(modelArrayBuffer);
       modelState.failed = false;
-      setStatus('statusModelReady', {}, 'ready');
-      return session;
+      recordMetric('modelFetchMs', performance.now() - modelFetchStartedAt);
+      return modelState.bytes;
     })
     .catch(error => {
-      console.error(error);
+      warmupState.modelBytesPromise = null;
       modelState.failed = true;
-      setStatus('statusModelFailed', {}, 'error');
       throw error;
-    })
-    .finally(() => {
-      modelState.promise = null;
     });
-  return modelState.promise;
+  return warmupState.modelBytesPromise;
+}
+
+async function ensurePlateModel(options = {}) {
+  const { silent = false } = options;
+  if (modelState.session) {
+    warmupState.completed = true;
+    return modelState.session;
+  }
+  warmupState.started = true;
+  warmupState.queued = false;
+  warmupState.skippedReason = '';
+  await ensureOrtRuntime({ silent });
+  if (!warmupState.sessionPromise) {
+    warmupState.sessionPromise = (async () => {
+      const ort = runtimeState.ort || await ensureOrtRuntime({ silent: true });
+      const modelBytes = await fetchModelBytes();
+      const sessionStartedAt = performance.now();
+      const session = await ort.InferenceSession.create(modelBytes, {
+        executionProviders: ['wasm']
+      });
+      recordMetric('sessionCreateMs', performance.now() - sessionStartedAt);
+      modelState.session = session;
+      modelState.failed = false;
+      warmupState.completed = true;
+      return session;
+    })().catch(error => {
+      warmupState.sessionPromise = null;
+      warmupState.completed = false;
+      modelState.failed = true;
+      throw error;
+    });
+  }
+  if (!silent) {
+    setStatus('statusLoadingModel', {}, 'loading');
+  }
+  try {
+    const session = await warmupState.sessionPromise;
+    if (!silent) {
+      setStatus('statusModelReady', {}, 'ready');
+    }
+    return session;
+  } catch (error) {
+    console.error(error);
+    if (!silent) {
+      setStatus('statusModelFailed', {}, 'error');
+    }
+    throw error;
+  }
 }
 
 async function ensureOverlayImage() {
@@ -1421,13 +1682,18 @@ function parseDetections(outputTensor) {
 }
 
 async function detectPlateBoxes() {
-  const session = await ensurePlateModel();
+  const detectionStartedAt = performance.now();
+  const session = await ensurePlateModel({ silent: false });
   const ort = runtimeState.ort;
   const inputTensor = createModelTensor(ort, originalImage);
   const inputName = session.inputNames?.[0] || 'images';
   const result = await session.run({ [inputName]: inputTensor });
   const outputName = session.outputNames?.[0] || Object.keys(result)[0];
-  return parseDetections(result[outputName]);
+  const detections = parseDetections(result[outputName]);
+  if (performanceMetrics.firstDetectMs == null) {
+    recordMetric('firstDetectMs', performance.now() - detectionStartedAt);
+  }
+  return detections;
 }
 
 function applyDetectedShapes(detections) {
@@ -1858,6 +2124,14 @@ elements.themeToggle.addEventListener('click', () => {
   setTheme(currentTheme === 'dark' ? 'light' : 'dark');
 });
 
+elements.collapsibleSections.forEach(section => {
+  section.addEventListener('toggle', () => {
+    if (isMobileLayout()) {
+      section.dataset.mobileOpen = section.open ? 'true' : 'false';
+    }
+  });
+});
+
 elements.mode.addEventListener('change', async () => {
   redactionMode = elements.mode.value;
   updateControls();
@@ -1896,6 +2170,23 @@ elements.blurSlider.addEventListener('input', () => {
 
 elements.zoomSlider.addEventListener('input', fitToViewport);
 window.addEventListener('resize', fitToViewport);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', fitToViewport);
+}
+addMediaQueryChangeListener(mobileLayoutQuery, handleResponsiveLayoutChange);
+addMediaQueryChangeListener(coarsePointerQuery, () => {
+  render();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    scheduleAdaptiveWarmup();
+  }
+});
+if (networkInformation && typeof networkInformation.addEventListener === 'function') {
+  networkInformation.addEventListener('change', () => {
+    scheduleAdaptiveWarmup();
+  });
+}
 
 elements.canvas.addEventListener('pointerdown', event => {
   if (!originalImage || isBusy) {
@@ -1997,12 +2288,17 @@ elements.canvas.addEventListener('pointercancel', event => {
   endDrag(event.pointerId);
 });
 
+setupPrimaryActionRestoreSlots();
+syncMobilePrimaryActions();
+syncCollapsibleSections();
 updateStaticText();
 document.body.dataset.busy = 'false';
 updateControls();
 updateBoxList();
+handleResponsiveLayoutChange();
 if (!browserSupported) {
   setStatus('statusBrowserUnsupported', {}, 'error');
 } else {
   setStatus('statusSelectPhoto', {}, 'info');
+  scheduleAdaptiveWarmup();
 }
