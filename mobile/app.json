@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Plate Blur Mobile",
+    "slug": "plate-blur-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "plateblurmobile",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      "onnxruntime-react-native",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Allow Plate Blur to take photos so it can detect and blur license plates on-device.",
+          "photosPermission": "Allow Plate Blur to import photos so it can detect and blur license plates."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Plate Blur to save edited photos back to your library."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
