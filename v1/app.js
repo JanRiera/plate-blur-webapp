@@ -9,7 +9,7 @@ const translations = {
     autoDetectAll: 'Auto Detect All',
     addBox: 'Add Box',
     clearBoxes: 'Clear All Boxes',
-    deleteBox: 'Clear Selected Box',
+    deleteBox: 'Clear Box',
     saveCopy: 'Save Copy',
     saveAll: 'Save All',
     previous: 'Previous',
@@ -37,7 +37,7 @@ const translations = {
     zoom: 'Zoom',
     helpDragResize: 'Drag inside a box to move it. Drag a corner handle to resize it.',
     helpReviewDetect: 'Auto-detect is only a rough prototype. Review every box before saving.',
-    noShapesYet: 'No redaction areas yet.',
+    noShapesYet: 'No detected areas yet.',
     boxListItem: 'Area {index}: {label}{confidence}',
     shapeConfidence: ' • {confidence}%',
     shapeManual: 'manual',
@@ -82,7 +82,7 @@ const translations = {
     autoDetectAll: 'すべて自動検出',
     addBox: 'ボックスを追加',
     clearBoxes: 'すべてのボックスを削除',
-    deleteBox: '選択したボックスを削除',
+    deleteBox: 'ボックスを削除',
     saveCopy: 'コピーを保存',
     saveAll: 'すべて保存',
     previous: '前へ',
@@ -110,7 +110,7 @@ const translations = {
     zoom: 'ズーム',
     helpDragResize: 'ボックスの内側をドラッグすると移動できます。角のハンドルをドラッグするとサイズを変更できます。',
     helpReviewDetect: '自動検出は試作段階です。保存前にすべてのボックスを確認してください。',
-    noShapesYet: 'まだマスク領域はありません。',
+    noShapesYet: 'まだ検出された領域はありません。',
     boxListItem: '領域 {index}: {label}{confidence}',
     shapeConfidence: ' • {confidence}%',
     shapeManual: '手動',
@@ -155,7 +155,7 @@ const translations = {
     autoDetectAll: 'Detectar todas',
     addBox: 'Añadir cuadro',
     clearBoxes: 'Borrar todos los cuadros',
-    deleteBox: 'Borrar cuadro seleccionado',
+    deleteBox: 'Borrar cuadro',
     saveCopy: 'Guardar copia',
     saveAll: 'Guardar todo',
     previous: 'Anterior',
@@ -183,7 +183,7 @@ const translations = {
     zoom: 'Zoom',
     helpDragResize: 'Arrastra dentro de un cuadro para moverlo. Arrastra un controlador de esquina para cambiar su tamaño.',
     helpReviewDetect: 'La detección automática todavía es un prototipo. Revisa cada cuadro antes de guardar.',
-    noShapesYet: 'Todavía no hay áreas de censura.',
+    noShapesYet: 'Todavía no hay áreas detectadas.',
     boxListItem: 'Área {index}: {label}{confidence}',
     shapeConfidence: ' • {confidence}%',
     shapeManual: 'manual',
@@ -228,7 +228,7 @@ const translations = {
     autoDetectAll: 'Rileva tutte',
     addBox: 'Aggiungi riquadro',
     clearBoxes: 'Cancella tutti i riquadri',
-    deleteBox: 'Cancella il riquadro selezionato',
+    deleteBox: 'Cancella riquadro',
     saveCopy: 'Salva copia',
     saveAll: 'Salva tutto',
     previous: 'Precedente',
@@ -256,7 +256,7 @@ const translations = {
     zoom: 'Zoom',
     helpDragResize: 'Trascina dentro un riquadro per spostarlo. Trascina una maniglia d\'angolo per ridimensionarlo.',
     helpReviewDetect: 'Il rilevamento automatico è ancora un prototipo. Controlla ogni riquadro prima di salvare.',
-    noShapesYet: 'Non ci sono ancora aree di mascheratura.',
+    noShapesYet: 'Non ci sono ancora aree rilevate.',
     boxListItem: 'Area {index}: {label}{confidence}',
     shapeConfidence: ' • {confidence}%',
     shapeManual: 'manuale',
@@ -329,7 +329,7 @@ const translations = {
     zoom: 'Zoom',
     helpDragResize: 'Innerhalb eines Rahmens ziehen, um ihn zu verschieben. Einen Eckpunkt ziehen, um die Größe zu ändern.',
     helpReviewDetect: 'Die automatische Erkennung ist noch ein Prototyp. Prüfe jeden Rahmen vor dem Speichern.',
-    noShapesYet: 'Noch keine Verdeckungsbereiche vorhanden.',
+    noShapesYet: 'Noch keine erkannten Bereiche vorhanden.',
     boxListItem: 'Bereich {index}: {label}{confidence}',
     shapeConfidence: ' • {confidence}%',
     shapeManual: 'manuell',
@@ -363,16 +363,238 @@ const translations = {
     statusSaveAllComplete: 'Alle Fotos wurden gespeichert.',
     statusOverlayRequiredForSave: 'Das AMG-Overlay muss vollständig geladen sein, bevor gespeichert werden kann.',
     statusWaitingForImage: 'Lade ein Foto, bevor du diese Aktion ausführst.'
+  },
+  ca: {
+    appTitle: 'Prototip de difuminat de matrícules',
+    uploadPhotos: 'Tria fotos',
+    photoSelectionEmpty: 'No hi ha fotos seleccionades.',
+    photoSelectionSingle: '{name}',
+    photoSelectionMultiple: 'S’han seleccionat {count} fotos.',
+    autoDetect: 'Detecció automàtica',
+    autoDetectAll: 'Detecta-ho tot',
+    addBox: 'Afegeix requadre',
+    clearBoxes: 'Esborra tots els requadres',
+    deleteBox: 'Esborra requadre',
+    saveCopy: 'Desa còpia',
+    saveAll: 'Desa-ho tot',
+    previous: 'Anterior',
+    next: 'Següent',
+    removePhoto: 'Elimina foto',
+    groupPhotos: 'Fotos',
+    groupNavigation: 'Navegació',
+    groupDetection: 'Detecció',
+    groupBoxes: 'Requadres',
+    groupExport: 'Exportació',
+    language: 'Idioma',
+    theme: 'Tema',
+    themeLight: 'Clar',
+    themeDark: 'Fosc',
+    languageNameEnglish: 'Anglès',
+    languageNameJapanese: 'Japonès',
+    languageNameSpanish: 'Espanyol',
+    languageNameItalian: 'Italià',
+    languageNameGerman: 'Alemany',
+    adjustments: 'Ajustos',
+    mode: 'Mode',
+    modeBlur: 'Difuminat',
+    modeAmg: 'Superposició AMG',
+    blurStrength: 'Intensitat del difuminat',
+    zoom: 'Zoom',
+    helpDragResize: 'Arrossega dins d’un requadre per moure’l. Arrossega una cantonada per canviar-ne la mida.',
+    helpReviewDetect: 'La detecció automàtica encara és un prototip. Revisa cada requadre abans de desar.',
+    noShapesYet: 'Encara no hi ha àrees detectades.',
+    boxListItem: 'Àrea {index}: {label}{confidence}',
+    shapeConfidence: ' • {confidence}%',
+    shapeManual: 'manual',
+    shapePlate: 'matrícula',
+    statusSelectPhoto: 'Selecciona una foto per començar.',
+    statusLoadedPhoto: 'Carregada {current} / {total}: {name}',
+    statusBrowserUnsupported: 'A aquest navegador li falten funcions necessàries per a l’editor local. Fes servir una versió recent de Chrome, Edge, Firefox o Safari.',
+    statusLoadingRuntime: 'S’està carregant l’ONNX Runtime local...',
+    statusRuntimeReady: 'El runtime local està a punt.',
+    statusRuntimeFailed: 'No s’ha pogut carregar el runtime local. Actualitza la pàgina i comprova que hi siguin els fitxers venedoritzats.',
+    statusLoadingModel: 'S’està carregant el model local de matrícules...',
+    statusModelReady: 'El model de matrícules està a punt.',
+    statusModelFailed: 'No s’ha pogut carregar el model local de matrícules.',
+    statusLoadingOverlay: 'S’està carregant la superposició AMG...',
+    statusOverlayReady: 'La superposició AMG està a punt.',
+    statusOverlayFailed: 'No s’ha pogut carregar la superposició AMG.',
+    statusImageLoadFailed: 'No s’ha pogut carregar la imatge seleccionada.',
+    statusResizedImageLoadFailed: 'No s’ha pogut crear la vista prèvia redimensionada.',
+    statusAutoDetecting: 'S’estan detectant matrícules localment...',
+    statusAutoDetectNone: 'El model de matrícules no ha trobat res fiable. Afegeix un requadre manualment.',
+    statusAutoDetectFound: 'La detecció automàtica ha afegit {count} àrea(es). Revisa-les.',
+    statusAutoDetectFailed: 'La detecció automàtica ha fallat en aquest navegador.',
+    statusAutoDetectAllProgress: 'S’està detectant {current} / {total}...',
+    statusAutoDetectAllComplete: 'S’ha completat Detecta-ho tot.',
+    statusBoxesCleared: 'S’han esborrat els requadres d’aquesta foto.',
+    statusNoPhotosInBatch: 'No hi ha fotos al lot.',
+    statusPhotoRemoved: 'S’ha eliminat {name}.',
+    statusSaving: 'S’està preparant la baixada...',
+    statusSaveFailed: 'No s’ha pogut exportar la imatge editada.',
+    statusSaveAllProgress: 'S’està desant {current} / {total}...',
+    statusSaveAllComplete: 'S’han desat totes les fotos.',
+    statusOverlayRequiredForSave: 'La superposició AMG ha d’acabar de carregar-se abans de desar.',
+    statusWaitingForImage: 'Carrega una foto abans d’executar aquesta acció.'
+  },
+  pl: {
+    appTitle: 'Prototyp rozmywania tablic',
+    uploadPhotos: 'Wybierz zdjęcia',
+    photoSelectionEmpty: 'Nie wybrano żadnych zdjęć.',
+    photoSelectionSingle: '{name}',
+    photoSelectionMultiple: 'Wybrano {count} zdjęć.',
+    autoDetect: 'Automatyczne wykrywanie',
+    autoDetectAll: 'Wykryj wszystko',
+    addBox: 'Dodaj ramkę',
+    clearBoxes: 'Wyczyść wszystkie ramki',
+    deleteBox: 'Wyczyść ramkę',
+    saveCopy: 'Zapisz kopię',
+    saveAll: 'Zapisz wszystko',
+    previous: 'Poprzednie',
+    next: 'Następne',
+    removePhoto: 'Usuń zdjęcie',
+    groupPhotos: 'Zdjęcia',
+    groupNavigation: 'Nawigacja',
+    groupDetection: 'Wykrywanie',
+    groupBoxes: 'Ramki',
+    groupExport: 'Eksport',
+    language: 'Język',
+    theme: 'Motyw',
+    themeLight: 'Jasny',
+    themeDark: 'Ciemny',
+    languageNameEnglish: 'Angielski',
+    languageNameJapanese: 'Japoński',
+    languageNameSpanish: 'Hiszpański',
+    languageNameItalian: 'Włoski',
+    languageNameGerman: 'Niemiecki',
+    adjustments: 'Ustawienia',
+    mode: 'Tryb',
+    modeBlur: 'Rozmycie',
+    modeAmg: 'Nakładka AMG',
+    blurStrength: 'Siła rozmycia',
+    zoom: 'Powiększenie',
+    helpDragResize: 'Przeciągnij wewnątrz ramki, aby ją przesunąć. Przeciągnij róg, aby zmienić rozmiar.',
+    helpReviewDetect: 'Automatyczne wykrywanie to wciąż tylko prototyp. Sprawdź każdą ramkę przed zapisaniem.',
+    noShapesYet: 'Nie ma jeszcze wykrytych obszarów.',
+    boxListItem: 'Obszar {index}: {label}{confidence}',
+    shapeConfidence: ' • {confidence}%',
+    shapeManual: 'ręcznie',
+    shapePlate: 'tablica',
+    statusSelectPhoto: 'Wybierz zdjęcie, aby rozpocząć.',
+    statusLoadedPhoto: 'Wczytano {current} / {total}: {name}',
+    statusBrowserUnsupported: 'W tej przeglądarce brakuje funkcji wymaganych przez lokalny edytor. Użyj aktualnej wersji Chrome, Edge, Firefox lub Safari.',
+    statusLoadingRuntime: 'Ładowanie lokalnego ONNX Runtime...',
+    statusRuntimeReady: 'Lokalny runtime jest gotowy.',
+    statusRuntimeFailed: 'Nie udało się załadować lokalnego runtime. Odśwież stronę i sprawdź, czy pliki vendor są obecne.',
+    statusLoadingModel: 'Ładowanie lokalnego modelu tablic...',
+    statusModelReady: 'Model tablic jest gotowy.',
+    statusModelFailed: 'Nie udało się załadować lokalnego modelu tablic.',
+    statusLoadingOverlay: 'Ładowanie nakładki AMG...',
+    statusOverlayReady: 'Nakładka AMG jest gotowa.',
+    statusOverlayFailed: 'Nie udało się załadować nakładki AMG.',
+    statusImageLoadFailed: 'Nie udało się wczytać wybranego obrazu.',
+    statusResizedImageLoadFailed: 'Nie udało się utworzyć pomniejszonego podglądu.',
+    statusAutoDetecting: 'Trwa lokalne wykrywanie tablic...',
+    statusAutoDetectNone: 'Model tablic nie znalazł niczego wiarygodnego. Dodaj ramkę ręcznie.',
+    statusAutoDetectFound: 'Automatyczne wykrywanie dodało {count} obszar(ów). Sprawdź je.',
+    statusAutoDetectFailed: 'Automatyczne wykrywanie nie powiodło się w tej przeglądarce.',
+    statusAutoDetectAllProgress: 'Wykrywanie {current} / {total}...',
+    statusAutoDetectAllComplete: 'Zakończono Wykryj wszystko.',
+    statusBoxesCleared: 'Ramki dla tego zdjęcia zostały wyczyszczone.',
+    statusNoPhotosInBatch: 'Brak zdjęć w zestawie.',
+    statusPhotoRemoved: 'Usunięto {name}.',
+    statusSaving: 'Przygotowywanie pobierania...',
+    statusSaveFailed: 'Nie udało się wyeksportować edytowanego obrazu.',
+    statusSaveAllProgress: 'Zapisywanie {current} / {total}...',
+    statusSaveAllComplete: 'Zapisano wszystkie zdjęcia.',
+    statusOverlayRequiredForSave: 'Nakładka AMG musi się w pełni załadować przed zapisaniem.',
+    statusWaitingForImage: 'Wczytaj zdjęcie przed uruchomieniem tej akcji.'
+  },
+  fr: {
+    appTitle: 'Prototype de floutage de plaques',
+    uploadPhotos: 'Choisir des photos',
+    photoSelectionEmpty: 'Aucune photo sélectionnée.',
+    photoSelectionSingle: '{name}',
+    photoSelectionMultiple: '{count} photos sélectionnées.',
+    autoDetect: 'Détection automatique',
+    autoDetectAll: 'Tout détecter',
+    addBox: 'Ajouter un cadre',
+    clearBoxes: 'Effacer tous les cadres',
+    deleteBox: 'Effacer le cadre',
+    saveCopy: 'Enregistrer une copie',
+    saveAll: 'Tout enregistrer',
+    previous: 'Précédent',
+    next: 'Suivant',
+    removePhoto: 'Supprimer la photo',
+    groupPhotos: 'Photos',
+    groupNavigation: 'Navigation',
+    groupDetection: 'Détection',
+    groupBoxes: 'Cadres',
+    groupExport: 'Export',
+    language: 'Langue',
+    theme: 'Thème',
+    themeLight: 'Clair',
+    themeDark: 'Sombre',
+    languageNameEnglish: 'Anglais',
+    languageNameJapanese: 'Japonais',
+    languageNameSpanish: 'Espagnol',
+    languageNameItalian: 'Italien',
+    languageNameGerman: 'Allemand',
+    adjustments: 'Réglages',
+    mode: 'Mode',
+    modeBlur: 'Flou',
+    modeAmg: 'Superposition AMG',
+    blurStrength: 'Intensité du flou',
+    zoom: 'Zoom',
+    helpDragResize: 'Faites glisser à l’intérieur d’un cadre pour le déplacer. Faites glisser un coin pour le redimensionner.',
+    helpReviewDetect: 'La détection automatique n’est encore qu’un prototype. Vérifiez chaque cadre avant d’enregistrer.',
+    noShapesYet: 'Aucune zone détectée pour le moment.',
+    boxListItem: 'Zone {index} : {label}{confidence}',
+    shapeConfidence: ' • {confidence}%',
+    shapeManual: 'manuel',
+    shapePlate: 'plaque',
+    statusSelectPhoto: 'Sélectionnez une photo pour commencer.',
+    statusLoadedPhoto: 'Chargée {current} / {total} : {name}',
+    statusBrowserUnsupported: 'Il manque à ce navigateur des fonctionnalités nécessaires à l’éditeur local. Utilisez une version récente de Chrome, Edge, Firefox ou Safari.',
+    statusLoadingRuntime: 'Chargement de l’ONNX Runtime local...',
+    statusRuntimeReady: 'Le runtime local est prêt.',
+    statusRuntimeFailed: 'Le runtime local n’a pas pu être chargé. Actualisez la page et vérifiez la présence des fichiers vendor.',
+    statusLoadingModel: 'Chargement du modèle local de plaques...',
+    statusModelReady: 'Le modèle de plaques est prêt.',
+    statusModelFailed: 'Le modèle local de plaques n’a pas pu être chargé.',
+    statusLoadingOverlay: 'Chargement de la superposition AMG...',
+    statusOverlayReady: 'La superposition AMG est prête.',
+    statusOverlayFailed: 'La superposition AMG n’a pas pu être chargée.',
+    statusImageLoadFailed: 'L’image sélectionnée n’a pas pu être chargée.',
+    statusResizedImageLoadFailed: 'L’aperçu redimensionné n’a pas pu être créé.',
+    statusAutoDetecting: 'Détection locale des plaques...',
+    statusAutoDetectNone: 'Le modèle de plaques n’a rien trouvé de fiable. Ajoutez un cadre manuellement.',
+    statusAutoDetectFound: 'La détection automatique a ajouté {count} zone(s). Vérifiez-les.',
+    statusAutoDetectFailed: 'La détection automatique a échoué dans ce navigateur.',
+    statusAutoDetectAllProgress: 'Détection {current} / {total}...',
+    statusAutoDetectAllComplete: 'Tout détecter est terminé.',
+    statusBoxesCleared: 'Les cadres de cette photo ont été effacés.',
+    statusNoPhotosInBatch: 'Aucune photo dans le lot.',
+    statusPhotoRemoved: '{name} a été supprimé.',
+    statusSaving: 'Préparation du téléchargement...',
+    statusSaveFailed: 'L’image modifiée n’a pas pu être exportée.',
+    statusSaveAllProgress: 'Enregistrement {current} / {total}...',
+    statusSaveAllComplete: 'Toutes les photos ont été enregistrées.',
+    statusOverlayRequiredForSave: 'La superposition AMG doit finir de se charger avant l’enregistrement.',
+    statusWaitingForImage: 'Chargez une photo avant d’exécuter cette action.'
   }
 };
 
-const supportedLanguageCodes = ['en', 'ja', 'es', 'it', 'de'];
+const supportedLanguageCodes = ['en', 'ja', 'es', 'it', 'de', 'ca', 'pl', 'fr'];
 const languagePresentation = {
   en: { flag: '🇬🇧', label: 'English' },
   ja: { flag: '🇯🇵', label: '日本語' },
   es: { flag: '🇪🇸', label: 'Español' },
   it: { flag: '🇮🇹', label: 'Italiano' },
-  de: { flag: '🇩🇪', label: 'Deutsch' }
+  de: { flag: '🇩🇪', label: 'Deutsch' },
+  ca: { flag: 'CAT', label: 'Català' },
+  pl: { flag: '🇵🇱', label: 'Polski' },
+  fr: { flag: '🇫🇷', label: 'Français' }
 };
 const storageKeys = {
   language: 'plateBlurLanguage',
@@ -458,13 +680,16 @@ let viewScale = 1;
 let shapes = [];
 let selectedId = null;
 let dragState = null;
+let activeDragPointerId = null;
 let hoverHandle = null;
 let hoveredShape = null;
 let isDragging = false;
 let isBusy = false;
 let latestLoadRequestId = 0;
 let blurCacheSignature = '';
+let pinchState = null;
 const primaryActionRestoreSlots = new Map();
+const activeTouchPointers = new Map();
 
 const overlayState = {
   image: null,
@@ -608,8 +833,11 @@ function applyTheme() {
 }
 
 function updateThemeToggle() {
+  const themeLabel = translate(currentTheme === 'dark' ? 'themeDark' : 'themeLight');
   elements.themeToggle.setAttribute('aria-pressed', currentTheme === 'dark' ? 'true' : 'false');
-  elements.themeToggleText.textContent = translate(currentTheme === 'dark' ? 'themeDark' : 'themeLight');
+  elements.themeToggle.setAttribute('aria-label', `${translate('theme')}: ${themeLabel}`);
+  elements.themeToggle.title = `${translate('theme')}: ${themeLabel}`;
+  elements.themeToggleText.textContent = themeLabel;
 }
 
 function refreshStatus() {
@@ -652,7 +880,7 @@ function getHandleDrawRadius(isSelected) {
 }
 
 function setupPrimaryActionRestoreSlots() {
-  [elements.autoDetect, elements.addBox, elements.save].forEach(button => {
+  [elements.autoDetect, elements.autoDetectAll, elements.addBox, elements.deleteBox, elements.save, elements.saveAll].forEach(button => {
     if (!button?.parentNode || primaryActionRestoreSlots.has(button.id)) {
       return;
     }
@@ -674,7 +902,7 @@ function syncMobilePrimaryActions() {
   if (!elements.mobilePrimaryActions) {
     return;
   }
-  const primaryButtons = [elements.autoDetect, elements.addBox, elements.save];
+  const primaryButtons = [elements.autoDetect, elements.autoDetectAll, elements.addBox, elements.deleteBox, elements.save, elements.saveAll];
   if (isMobileLayout()) {
     primaryButtons.forEach(button => {
       elements.mobilePrimaryActions.appendChild(button);
@@ -792,6 +1020,26 @@ function updateStaticText() {
   updateBoxList();
   refreshStatus();
 }
+  // Show/hide canvas-meta depending on photoPositionBadge content
+  function updateCanvasMetaVisibility() {
+    var badge = document.getElementById('photoPositionBadge');
+    var meta = document.getElementById('canvasMeta');
+    if (!badge || !meta) return;
+    if (badge.textContent.trim() !== '') {
+      meta.style.display = '';
+    } else {
+      meta.style.display = 'none';
+    }
+  }
+  // Optionally, observe changes to the badge
+  const badgeObserver = new MutationObserver(updateCanvasMetaVisibility);
+  const badgeEl = document.getElementById('photoPositionBadge');
+  if (badgeEl) {
+    badgeObserver.observe(badgeEl, { childList: true, characterData: true, subtree: true });
+  }
+  // Initial check
+  updateCanvasMetaVisibility();
+
 
 function setLanguage(languageCode) {
   currentLanguage = normalizeLanguageCode(languageCode);
@@ -1096,6 +1344,143 @@ function imageToCanvasPoint(clientX, clientY) {
     x: (clientX - canvasBounds.left) / viewScale,
     y: (clientY - canvasBounds.top) / viewScale
   };
+}
+
+function clampImagePoint(targetPoint) {
+  if (!originalImage) {
+    return targetPoint;
+  }
+  return {
+    x: clamp(targetPoint.x, 0, originalImage.width),
+    y: clamp(targetPoint.y, 0, originalImage.height)
+  };
+}
+
+function getZoomLimits() {
+  return {
+    min: Number(elements.zoomSlider.min) || 25,
+    max: Number(elements.zoomSlider.max) || 200
+  };
+}
+
+function setZoomValue(nextZoomValue, options = {}) {
+  const {
+    anchorClientX = null,
+    anchorClientY = null,
+    anchorImagePoint = null
+  } = options;
+  const { min, max } = getZoomLimits();
+  const normalizedZoomValue = clamp(Number(nextZoomValue) || 100, min, max);
+  const canvasWrapBounds = anchorImagePoint ? elements.canvasWrap.getBoundingClientRect() : null;
+  elements.zoomSlider.value = String(normalizedZoomValue);
+  fitToViewport();
+  if (!canvasWrapBounds || anchorClientX == null || anchorClientY == null || !anchorImagePoint) {
+    return;
+  }
+  const canvasBounds = elements.canvas.getBoundingClientRect();
+  const canvasContentLeft = elements.canvasWrap.scrollLeft + (canvasBounds.left - canvasWrapBounds.left);
+  const canvasContentTop = elements.canvasWrap.scrollTop + (canvasBounds.top - canvasWrapBounds.top);
+  elements.canvasWrap.scrollLeft = Math.max(
+    0,
+    canvasContentLeft + (anchorImagePoint.x * viewScale) - (anchorClientX - canvasWrapBounds.left)
+  );
+  elements.canvasWrap.scrollTop = Math.max(
+    0,
+    canvasContentTop + (anchorImagePoint.y * viewScale) - (anchorClientY - canvasWrapBounds.top)
+  );
+}
+
+function getCanvasViewportAnchorPoint() {
+  const canvasWrapBounds = elements.canvasWrap.getBoundingClientRect();
+  const canvasBounds = elements.canvas.getBoundingClientRect();
+  return {
+    x: clamp(canvasWrapBounds.left + (canvasWrapBounds.width / 2), canvasBounds.left, canvasBounds.right),
+    y: clamp(canvasWrapBounds.top + (canvasWrapBounds.height / 2), canvasBounds.top, canvasBounds.bottom)
+  };
+}
+
+function getTouchGestureMetrics() {
+  const touchPoints = Array.from(activeTouchPointers.values()).slice(0, 2);
+  if (touchPoints.length < 2) {
+    return null;
+  }
+  const [firstPoint, secondPoint] = touchPoints;
+  return {
+    distance: Math.max(distance(firstPoint, secondPoint), 1),
+    midpoint: {
+      x: (firstPoint.x + secondPoint.x) / 2,
+      y: (firstPoint.y + secondPoint.y) / 2
+    }
+  };
+}
+
+function releaseCanvasPointer(pointerId) {
+  if (typeof pointerId !== 'number') {
+    return;
+  }
+  try {
+    elements.canvas.releasePointerCapture(pointerId);
+  } catch {
+    void 0;
+  }
+}
+
+function cancelDragInteraction() {
+  releaseCanvasPointer(activeDragPointerId);
+  isDragging = false;
+  dragState = null;
+  activeDragPointerId = null;
+}
+
+function beginPinchGesture() {
+  const gestureMetrics = getTouchGestureMetrics();
+  if (!gestureMetrics || !originalImage) {
+    return;
+  }
+  cancelDragInteraction();
+  hoverHandle = null;
+  hoveredShape = null;
+  elements.canvas.style.cursor = 'default';
+  pinchState = {
+    startDistance: gestureMetrics.distance,
+    startZoomValue: Number(elements.zoomSlider.value),
+    anchorImagePoint: clampImagePoint(imageToCanvasPoint(gestureMetrics.midpoint.x, gestureMetrics.midpoint.y))
+  };
+  render();
+}
+
+function updatePinchGesture() {
+  if (!pinchState || !originalImage) {
+    return;
+  }
+  const gestureMetrics = getTouchGestureMetrics();
+  if (!gestureMetrics) {
+    return;
+  }
+  const nextZoomValue = pinchState.startZoomValue * (gestureMetrics.distance / pinchState.startDistance);
+  setZoomValue(nextZoomValue, {
+    anchorClientX: gestureMetrics.midpoint.x,
+    anchorClientY: gestureMetrics.midpoint.y,
+    anchorImagePoint: pinchState.anchorImagePoint
+  });
+}
+
+function endPinchGesture() {
+  pinchState = null;
+}
+
+function getWheelZoomFactor(wheelEvent) {
+  const deltaMultiplier = wheelEvent.deltaMode === WheelEvent.DOM_DELTA_LINE
+    ? 16
+    : wheelEvent.deltaMode === WheelEvent.DOM_DELTA_PAGE
+      ? 120
+      : 1;
+  return Math.exp((-wheelEvent.deltaY * deltaMultiplier) / 900);
+}
+
+function canPanZoomedCanvas() {
+  return elements.canvasWrap.scrollWidth > elements.canvasWrap.clientWidth + 1 ||
+    elements.canvasWrap.scrollHeight > elements.canvasWrap.clientHeight + 1;
 }
 
 function polygonPath(context, pointList, scale = 1) {
@@ -1787,6 +2172,49 @@ async function navigateBatch(nextIndex) {
   }
 }
 
+function bindPressableButton(button, onActivate) {
+  let activePointerId = null;
+  let suppressClickUntil = 0;
+
+  button.addEventListener('pointerdown', event => {
+    if (button.disabled || event.pointerType === 'mouse') {
+      return;
+    }
+    activePointerId = event.pointerId;
+    event.preventDefault();
+    event.stopPropagation();
+  });
+
+  button.addEventListener('pointerup', event => {
+    if (button.disabled || event.pointerType === 'mouse' || activePointerId !== event.pointerId) {
+      return;
+    }
+    activePointerId = null;
+    suppressClickUntil = Date.now() + 400;
+    event.preventDefault();
+    event.stopPropagation();
+    void onActivate();
+  });
+
+  button.addEventListener('pointercancel', event => {
+    if (activePointerId === event.pointerId) {
+      activePointerId = null;
+    }
+  });
+
+  button.addEventListener('click', event => {
+    if (button.disabled) {
+      return;
+    }
+    if (Date.now() < suppressClickUntil) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    void onActivate();
+  });
+}
+
 async function removeCurrentPhoto() {
   if (!batchImages.length || isBusy) {
     return;
@@ -2002,18 +2430,29 @@ async function saveAllPhotos() {
 }
 
 function endDrag(pointerId) {
-  if (typeof pointerId === 'number') {
-    try {
-      elements.canvas.releasePointerCapture(pointerId);
-    } catch {
-      void 0;
-    }
-  }
-  if (!isDragging && !dragState) {
+  if (typeof activeDragPointerId === 'number' && typeof pointerId === 'number' && pointerId !== activeDragPointerId) {
     return;
   }
+  releaseCanvasPointer(activeDragPointerId);
+  const hadDragInteraction = isDragging || Boolean(dragState);
+  const finishedDragState = dragState;
   isDragging = false;
   dragState = null;
+  activeDragPointerId = null;
+  if (!hadDragInteraction) {
+    return;
+  }
+  if (finishedDragState?.type === 'pan') {
+    elements.canvas.style.cursor = canPanZoomedCanvas() ? 'grab' : 'default';
+    if (!finishedDragState.moved) {
+      selectedId = null;
+      updateBoxList();
+      updateControls();
+      render();
+      saveSessionState();
+    }
+    return;
+  }
   render();
   persistCurrentEditorState();
 }
@@ -2158,9 +2597,9 @@ elements.save.addEventListener('click', () => {
 elements.saveAll.addEventListener('click', saveAllPhotos);
 elements.autoDetect.addEventListener('click', autoDetectCurrentPhoto);
 elements.autoDetectAll.addEventListener('click', autoDetectAllPhotos);
-elements.prev.addEventListener('click', () => navigateBatch(currentIndex - 1));
-elements.next.addEventListener('click', () => navigateBatch(currentIndex + 1));
 elements.removePhoto.addEventListener('click', removeCurrentPhoto);
+bindPressableButton(elements.prev, () => navigateBatch(currentIndex - 1));
+bindPressableButton(elements.next, () => navigateBatch(currentIndex + 1));
 
 elements.blurSlider.addEventListener('input', () => {
   blurCacheSignature = '';
@@ -2168,7 +2607,36 @@ elements.blurSlider.addEventListener('input', () => {
   saveSessionState();
 });
 
-elements.zoomSlider.addEventListener('input', fitToViewport);
+elements.zoomSlider.addEventListener('input', () => {
+  if (!originalImage) {
+    fitToViewport();
+    return;
+  }
+  const anchorPoint = getCanvasViewportAnchorPoint();
+  setZoomValue(Number(elements.zoomSlider.value), {
+    anchorClientX: anchorPoint.x,
+    anchorClientY: anchorPoint.y,
+    anchorImagePoint: clampImagePoint(imageToCanvasPoint(anchorPoint.x, anchorPoint.y))
+  });
+});
+
+elements.canvasWrap.addEventListener('wheel', event => {
+  if (!originalImage || isBusy || isMobileLayout() || hasCoarsePointer()) {
+    return;
+  }
+  event.preventDefault();
+  const nextZoomValue = Number(elements.zoomSlider.value) * getWheelZoomFactor(event);
+  const anchorPoint = {
+    x: event.clientX,
+    y: event.clientY
+  };
+  setZoomValue(nextZoomValue, {
+    anchorClientX: anchorPoint.x,
+    anchorClientY: anchorPoint.y,
+    anchorImagePoint: clampImagePoint(imageToCanvasPoint(anchorPoint.x, anchorPoint.y))
+  });
+}, { passive: false });
+
 window.addEventListener('resize', fitToViewport);
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', fitToViewport);
@@ -2192,10 +2660,22 @@ elements.canvas.addEventListener('pointerdown', event => {
   if (!originalImage || isBusy) {
     return;
   }
-  isDragging = true;
+  if (event.pointerType !== 'touch' && event.button !== 0) {
+    return;
+  }
+  if (event.pointerType === 'touch') {
+    activeTouchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  }
   if (typeof elements.canvas.setPointerCapture === 'function') {
     elements.canvas.setPointerCapture(event.pointerId);
   }
+  if (event.pointerType === 'touch' && activeTouchPointers.size >= 2) {
+    event.preventDefault();
+    beginPinchGesture();
+    return;
+  }
+  isDragging = true;
+  activeDragPointerId = event.pointerId;
   const canvasPoint = imageToCanvasPoint(event.clientX, event.clientY);
   const handle = findHandle(canvasPoint);
   if (handle) {
@@ -2224,6 +2704,19 @@ elements.canvas.addEventListener('pointerdown', event => {
     render();
     return;
   }
+  if (event.pointerType === 'mouse' && !isMobileLayout() && !hasCoarsePointer() && canPanZoomedCanvas()) {
+    dragState = {
+      type: 'pan',
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startScrollLeft: elements.canvasWrap.scrollLeft,
+      startScrollTop: elements.canvasWrap.scrollTop,
+      moved: false
+    };
+    elements.canvas.style.cursor = 'grabbing';
+    event.preventDefault();
+    return;
+  }
   selectedId = null;
   dragState = null;
   updateBoxList();
@@ -2236,10 +2729,39 @@ elements.canvas.addEventListener('pointermove', event => {
   if (!originalImage) {
     return;
   }
+  if (event.pointerType === 'touch' && activeTouchPointers.has(event.pointerId)) {
+    activeTouchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pinchState && activeTouchPointers.size >= 2) {
+      event.preventDefault();
+      updatePinchGesture();
+      return;
+    }
+  }
+  if (dragState && typeof activeDragPointerId === 'number' && event.pointerId !== activeDragPointerId) {
+    return;
+  }
+  if (dragState?.type === 'pan') {
+    const deltaX = event.clientX - dragState.startClientX;
+    const deltaY = event.clientY - dragState.startClientY;
+    dragState.moved = dragState.moved || Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2;
+    elements.canvasWrap.scrollLeft = dragState.startScrollLeft - deltaX;
+    elements.canvasWrap.scrollTop = dragState.startScrollTop - deltaY;
+    event.preventDefault();
+    return;
+  }
   const canvasPoint = imageToCanvasPoint(event.clientX, event.clientY);
+  if (event.pointerType === 'touch' && !dragState) {
+    return;
+  }
   const nextHandle = findHandle(canvasPoint);
   const nextHoveredShape = nextHandle ? nextHandle.shape : findShape(canvasPoint);
-  elements.canvas.style.cursor = nextHandle ? 'grab' : nextHoveredShape ? 'move' : 'default';
+  elements.canvas.style.cursor = nextHandle
+    ? 'grab'
+    : nextHoveredShape
+      ? 'move'
+      : event.pointerType !== 'touch' && !isMobileLayout() && !hasCoarsePointer() && canPanZoomedCanvas()
+        ? 'grab'
+        : 'default';
   if (!dragState) {
     const handleChanged = !sameHandle(nextHandle, hoverHandle);
     const shapeChanged = !sameShape(nextHoveredShape, hoveredShape);
@@ -2281,10 +2803,30 @@ elements.canvas.addEventListener('pointerleave', () => {
 });
 
 elements.canvas.addEventListener('pointerup', event => {
+  if (event.pointerType === 'touch') {
+    activeTouchPointers.delete(event.pointerId);
+    if (pinchState) {
+      if (activeTouchPointers.size >= 2) {
+        beginPinchGesture();
+      } else {
+        endPinchGesture();
+      }
+    }
+  }
   endDrag(event.pointerId);
 });
 
 elements.canvas.addEventListener('pointercancel', event => {
+  if (event.pointerType === 'touch') {
+    activeTouchPointers.delete(event.pointerId);
+    if (pinchState) {
+      if (activeTouchPointers.size >= 2) {
+        beginPinchGesture();
+      } else {
+        endPinchGesture();
+      }
+    }
+  }
   endDrag(event.pointerId);
 });
 
