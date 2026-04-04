@@ -658,7 +658,7 @@ function getHandleDrawRadius(isSelected) {
 }
 
 function setupPrimaryActionRestoreSlots() {
-  [elements.autoDetect, elements.autoDetectAll, elements.deleteBox, elements.saveAll].forEach(button => {
+  [elements.autoDetect, elements.autoDetectAll, elements.addBox, elements.deleteBox, elements.save, elements.saveAll].forEach(button => {
     if (!button?.parentNode || primaryActionRestoreSlots.has(button.id)) {
       return;
     }
@@ -680,7 +680,7 @@ function syncMobilePrimaryActions() {
   if (!elements.mobilePrimaryActions) {
     return;
   }
-  const primaryButtons = [elements.autoDetect, elements.autoDetectAll, elements.deleteBox, elements.saveAll];
+  const primaryButtons = [elements.autoDetect, elements.autoDetectAll, elements.addBox, elements.deleteBox, elements.save, elements.saveAll];
   if (isMobileLayout()) {
     primaryButtons.forEach(button => {
       elements.mobilePrimaryActions.appendChild(button);
