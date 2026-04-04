@@ -458,13 +458,16 @@ let viewScale = 1;
 let shapes = [];
 let selectedId = null;
 let dragState = null;
+let activeDragPointerId = null;
 let hoverHandle = null;
 let hoveredShape = null;
 let isDragging = false;
 let isBusy = false;
 let latestLoadRequestId = 0;
 let blurCacheSignature = '';
+let pinchState = null;
 const primaryActionRestoreSlots = new Map();
+const activeTouchPointers = new Map();
 
 const overlayState = {
   image: null,
@@ -1096,6 +1099,129 @@ function imageToCanvasPoint(clientX, clientY) {
     x: (clientX - canvasBounds.left) / viewScale,
     y: (clientY - canvasBounds.top) / viewScale
   };
+}
+
+function clampImagePoint(targetPoint) {
+  if (!originalImage) {
+    return targetPoint;
+  }
+  return {
+    x: clamp(targetPoint.x, 0, originalImage.width),
+    y: clamp(targetPoint.y, 0, originalImage.height)
+  };
+}
+
+function getZoomLimits() {
+  return {
+    min: Number(elements.zoomSlider.min) || 25,
+    max: Number(elements.zoomSlider.max) || 200
+  };
+}
+
+function setZoomValue(nextZoomValue, options = {}) {
+  const {
+    anchorClientX = null,
+    anchorClientY = null,
+    anchorImagePoint = null
+  } = options;
+  const { min, max } = getZoomLimits();
+  const normalizedZoomValue = clamp(Number(nextZoomValue) || 100, min, max);
+  const canvasWrapBounds = anchorImagePoint ? elements.canvasWrap.getBoundingClientRect() : null;
+  elements.zoomSlider.value = String(normalizedZoomValue);
+  fitToViewport();
+  if (!canvasWrapBounds || anchorClientX == null || anchorClientY == null || !anchorImagePoint) {
+    return;
+  }
+  const canvasBounds = elements.canvas.getBoundingClientRect();
+  const canvasContentLeft = elements.canvasWrap.scrollLeft + (canvasBounds.left - canvasWrapBounds.left);
+  const canvasContentTop = elements.canvasWrap.scrollTop + (canvasBounds.top - canvasWrapBounds.top);
+  elements.canvasWrap.scrollLeft = Math.max(
+    0,
+    canvasContentLeft + (anchorImagePoint.x * viewScale) - (anchorClientX - canvasWrapBounds.left)
+  );
+  elements.canvasWrap.scrollTop = Math.max(
+    0,
+    canvasContentTop + (anchorImagePoint.y * viewScale) - (anchorClientY - canvasWrapBounds.top)
+  );
+}
+
+function getCanvasViewportAnchorPoint() {
+  const canvasWrapBounds = elements.canvasWrap.getBoundingClientRect();
+  const canvasBounds = elements.canvas.getBoundingClientRect();
+  return {
+    x: clamp(canvasWrapBounds.left + (canvasWrapBounds.width / 2), canvasBounds.left, canvasBounds.right),
+    y: clamp(canvasWrapBounds.top + (canvasWrapBounds.height / 2), canvasBounds.top, canvasBounds.bottom)
+  };
+}
+
+function getTouchGestureMetrics() {
+  const touchPoints = Array.from(activeTouchPointers.values()).slice(0, 2);
+  if (touchPoints.length < 2) {
+    return null;
+  }
+  const [firstPoint, secondPoint] = touchPoints;
+  return {
+    distance: Math.max(distance(firstPoint, secondPoint), 1),
+    midpoint: {
+      x: (firstPoint.x + secondPoint.x) / 2,
+      y: (firstPoint.y + secondPoint.y) / 2
+    }
+  };
+}
+
+function releaseCanvasPointer(pointerId) {
+  if (typeof pointerId !== 'number') {
+    return;
+  }
+  try {
+    elements.canvas.releasePointerCapture(pointerId);
+  } catch {
+    void 0;
+  }
+}
+
+function cancelDragInteraction() {
+  releaseCanvasPointer(activeDragPointerId);
+  isDragging = false;
+  dragState = null;
+  activeDragPointerId = null;
+}
+
+function beginPinchGesture() {
+  const gestureMetrics = getTouchGestureMetrics();
+  if (!gestureMetrics || !originalImage) {
+    return;
+  }
+  cancelDragInteraction();
+  hoverHandle = null;
+  hoveredShape = null;
+  elements.canvas.style.cursor = 'default';
+  pinchState = {
+    startDistance: gestureMetrics.distance,
+    startZoomValue: Number(elements.zoomSlider.value),
+    anchorImagePoint: clampImagePoint(imageToCanvasPoint(gestureMetrics.midpoint.x, gestureMetrics.midpoint.y))
+  };
+  render();
+}
+
+function updatePinchGesture() {
+  if (!pinchState || !originalImage) {
+    return;
+  }
+  const gestureMetrics = getTouchGestureMetrics();
+  if (!gestureMetrics) {
+    return;
+  }
+  const nextZoomValue = pinchState.startZoomValue * (gestureMetrics.distance / pinchState.startDistance);
+  setZoomValue(nextZoomValue, {
+    anchorClientX: gestureMetrics.midpoint.x,
+    anchorClientY: gestureMetrics.midpoint.y,
+    anchorImagePoint: pinchState.anchorImagePoint
+  });
+}
+
+function endPinchGesture() {
+  pinchState = null;
 }
 
 function polygonPath(context, pointList, scale = 1) {
@@ -1787,6 +1913,49 @@ async function navigateBatch(nextIndex) {
   }
 }
 
+function bindPressableButton(button, onActivate) {
+  let activePointerId = null;
+  let suppressClickUntil = 0;
+
+  button.addEventListener('pointerdown', event => {
+    if (button.disabled || event.pointerType === 'mouse') {
+      return;
+    }
+    activePointerId = event.pointerId;
+    event.preventDefault();
+    event.stopPropagation();
+  });
+
+  button.addEventListener('pointerup', event => {
+    if (button.disabled || event.pointerType === 'mouse' || activePointerId !== event.pointerId) {
+      return;
+    }
+    activePointerId = null;
+    suppressClickUntil = Date.now() + 400;
+    event.preventDefault();
+    event.stopPropagation();
+    void onActivate();
+  });
+
+  button.addEventListener('pointercancel', event => {
+    if (activePointerId === event.pointerId) {
+      activePointerId = null;
+    }
+  });
+
+  button.addEventListener('click', event => {
+    if (button.disabled) {
+      return;
+    }
+    if (Date.now() < suppressClickUntil) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    void onActivate();
+  });
+}
+
 async function removeCurrentPhoto() {
   if (!batchImages.length || isBusy) {
     return;
@@ -2002,18 +2171,17 @@ async function saveAllPhotos() {
 }
 
 function endDrag(pointerId) {
-  if (typeof pointerId === 'number') {
-    try {
-      elements.canvas.releasePointerCapture(pointerId);
-    } catch {
-      void 0;
-    }
-  }
-  if (!isDragging && !dragState) {
+  if (typeof activeDragPointerId === 'number' && typeof pointerId === 'number' && pointerId !== activeDragPointerId) {
     return;
   }
+  releaseCanvasPointer(activeDragPointerId);
+  const hadDragInteraction = isDragging || Boolean(dragState);
   isDragging = false;
   dragState = null;
+  activeDragPointerId = null;
+  if (!hadDragInteraction) {
+    return;
+  }
   render();
   persistCurrentEditorState();
 }
@@ -2158,9 +2326,9 @@ elements.save.addEventListener('click', () => {
 elements.saveAll.addEventListener('click', saveAllPhotos);
 elements.autoDetect.addEventListener('click', autoDetectCurrentPhoto);
 elements.autoDetectAll.addEventListener('click', autoDetectAllPhotos);
-elements.prev.addEventListener('click', () => navigateBatch(currentIndex - 1));
-elements.next.addEventListener('click', () => navigateBatch(currentIndex + 1));
 elements.removePhoto.addEventListener('click', removeCurrentPhoto);
+bindPressableButton(elements.prev, () => navigateBatch(currentIndex - 1));
+bindPressableButton(elements.next, () => navigateBatch(currentIndex + 1));
 
 elements.blurSlider.addEventListener('input', () => {
   blurCacheSignature = '';
@@ -2168,7 +2336,18 @@ elements.blurSlider.addEventListener('input', () => {
   saveSessionState();
 });
 
-elements.zoomSlider.addEventListener('input', fitToViewport);
+elements.zoomSlider.addEventListener('input', () => {
+  if (!originalImage) {
+    fitToViewport();
+    return;
+  }
+  const anchorPoint = getCanvasViewportAnchorPoint();
+  setZoomValue(Number(elements.zoomSlider.value), {
+    anchorClientX: anchorPoint.x,
+    anchorClientY: anchorPoint.y,
+    anchorImagePoint: clampImagePoint(imageToCanvasPoint(anchorPoint.x, anchorPoint.y))
+  });
+});
 window.addEventListener('resize', fitToViewport);
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', fitToViewport);
@@ -2192,10 +2371,19 @@ elements.canvas.addEventListener('pointerdown', event => {
   if (!originalImage || isBusy) {
     return;
   }
-  isDragging = true;
+  if (event.pointerType === 'touch') {
+    activeTouchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  }
   if (typeof elements.canvas.setPointerCapture === 'function') {
     elements.canvas.setPointerCapture(event.pointerId);
   }
+  if (event.pointerType === 'touch' && activeTouchPointers.size >= 2) {
+    event.preventDefault();
+    beginPinchGesture();
+    return;
+  }
+  isDragging = true;
+  activeDragPointerId = event.pointerId;
   const canvasPoint = imageToCanvasPoint(event.clientX, event.clientY);
   const handle = findHandle(canvasPoint);
   if (handle) {
@@ -2236,7 +2424,21 @@ elements.canvas.addEventListener('pointermove', event => {
   if (!originalImage) {
     return;
   }
+  if (event.pointerType === 'touch' && activeTouchPointers.has(event.pointerId)) {
+    activeTouchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pinchState && activeTouchPointers.size >= 2) {
+      event.preventDefault();
+      updatePinchGesture();
+      return;
+    }
+  }
+  if (dragState && typeof activeDragPointerId === 'number' && event.pointerId !== activeDragPointerId) {
+    return;
+  }
   const canvasPoint = imageToCanvasPoint(event.clientX, event.clientY);
+  if (event.pointerType === 'touch' && !dragState) {
+    return;
+  }
   const nextHandle = findHandle(canvasPoint);
   const nextHoveredShape = nextHandle ? nextHandle.shape : findShape(canvasPoint);
   elements.canvas.style.cursor = nextHandle ? 'grab' : nextHoveredShape ? 'move' : 'default';
@@ -2281,10 +2483,30 @@ elements.canvas.addEventListener('pointerleave', () => {
 });
 
 elements.canvas.addEventListener('pointerup', event => {
+  if (event.pointerType === 'touch') {
+    activeTouchPointers.delete(event.pointerId);
+    if (pinchState) {
+      if (activeTouchPointers.size >= 2) {
+        beginPinchGesture();
+      } else {
+        endPinchGesture();
+      }
+    }
+  }
   endDrag(event.pointerId);
 });
 
 elements.canvas.addEventListener('pointercancel', event => {
+  if (event.pointerType === 'touch') {
+    activeTouchPointers.delete(event.pointerId);
+    if (pinchState) {
+      if (activeTouchPointers.size >= 2) {
+        beginPinchGesture();
+      } else {
+        endPinchGesture();
+      }
+    }
+  }
   endDrag(event.pointerId);
 });
 

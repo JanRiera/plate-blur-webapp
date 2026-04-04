@@ -445,6 +445,7 @@ html[data-theme="dark"] .theme-icon-moon {
   grid-template-columns: minmax(0, 1fr) 340px;
   gap: 16px;
   align-items: start;
+  min-width: 0;
 }
 
 .workspace-column {
@@ -475,6 +476,7 @@ html[data-theme="dark"] .theme-icon-moon {
 .canvas-panel {
   position: relative;
   min-height: 620px;
+  min-width: 0;
   padding: 18px;
 }
 
@@ -508,6 +510,8 @@ html[data-theme="dark"] .theme-icon-moon {
   align-items: flex-start;
   justify-content: center;
   min-height: 580px;
+  min-width: 0;
+  max-width: 100%;
   max-height: min(78vh, 940px);
   overflow: auto;
   overscroll-behavior: contain;
@@ -529,9 +533,14 @@ canvas {
   position: absolute;
   top: 50%;
   z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   width: 56px;
   height: 56px;
   padding: 0;
+  overflow: hidden;
   border-radius: 999px;
   background: var(--canvas-nav-background);
   color: var(--canvas-nav-text);
@@ -539,11 +548,18 @@ canvas {
   box-shadow: var(--canvas-nav-shadow);
   transform: translateY(-50%);
   backdrop-filter: blur(12px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .canvas-nav svg {
   width: 22px;
   height: 22px;
+  pointer-events: none;
+}
+
+.canvas-nav .visually-hidden {
+  pointer-events: none;
 }
 
 .canvas-nav-prev {
@@ -564,6 +580,7 @@ canvas {
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
   gap: 16px;
   align-items: start;
+  min-width: 0;
 }
 
 .side-panel {
@@ -571,6 +588,7 @@ canvas {
   gap: 14px;
   padding: 16px;
   align-content: start;
+  min-width: 0;
 }
 
 .tool-section {
@@ -580,6 +598,7 @@ canvas {
   border-radius: 18px;
   background: var(--panel-background-soft);
   min-width: 0;
+  max-width: 100%;
 }
 
 .tool-section-summary {
@@ -743,7 +762,7 @@ body[data-busy="true"] .file-picker {
 
 @media (max-width: 1180px) {
   .stage {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .canvas-panel {
@@ -757,7 +776,7 @@ body[data-busy="true"] .file-picker {
 
 @media (max-width: 960px) {
   .utility-panels {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .tool-section-boxes .tool-actions {
@@ -778,6 +797,7 @@ body[data-busy="true"] .file-picker {
   .app-topbar,
   .photo-bar {
     flex-direction: column;
+    justify-content: flex-start;
     align-items: stretch;
   }
 
@@ -788,6 +808,11 @@ body[data-busy="true"] .file-picker {
   .preferences-panel,
   .photo-bar-actions {
     width: 100%;
+  }
+
+  .photo-bar-actions {
+    flex: 0 0 auto;
+    align-content: flex-start;
   }
 
   .setting-group,
@@ -807,6 +832,8 @@ body[data-busy="true"] .file-picker {
 
   .photo-bar-summary {
     min-width: 0;
+    flex: 0 0 auto;
+    align-content: flex-start;
   }
 
   .stage,
@@ -814,11 +841,21 @@ body[data-busy="true"] .file-picker {
   .utility-panels,
   .side-panel {
     gap: 12px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .workspace-column > *,
+  .utility-panels > *,
+  .side-panel > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .utility-panels,
   .side-panel {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .canvas-panel {
