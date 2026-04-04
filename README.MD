@@ -14,3 +14,9 @@ Then open:
 ```text
 http://127.0.0.1:8000/
 ```
+
+## License
+
+This repository is licensed under [PolyForm Noncommercial 1.0.0](LICENSE).
+
+Commercial use is not granted under the public license. For commercial permissions, see [COMMERCIAL-USE.md](COMMERCIAL-USE.md).
