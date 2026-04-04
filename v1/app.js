@@ -1253,6 +1253,11 @@ function getWheelZoomFactor(wheelEvent) {
   return Math.exp((-wheelEvent.deltaY * deltaMultiplier) / 900);
 }
 
+function canPanZoomedCanvas() {
+  return elements.canvasWrap.scrollWidth > elements.canvasWrap.clientWidth + 1 ||
+    elements.canvasWrap.scrollHeight > elements.canvasWrap.clientHeight + 1;
+}
+
 function polygonPath(context, pointList, scale = 1) {
   context.beginPath();
   context.moveTo(pointList[0].x * scale, pointList[0].y * scale);
@@ -2205,10 +2210,22 @@ function endDrag(pointerId) {
   }
   releaseCanvasPointer(activeDragPointerId);
   const hadDragInteraction = isDragging || Boolean(dragState);
+  const finishedDragState = dragState;
   isDragging = false;
   dragState = null;
   activeDragPointerId = null;
   if (!hadDragInteraction) {
+    return;
+  }
+  if (finishedDragState?.type === 'pan') {
+    elements.canvas.style.cursor = canPanZoomedCanvas() ? 'grab' : 'default';
+    if (!finishedDragState.moved) {
+      selectedId = null;
+      updateBoxList();
+      updateControls();
+      render();
+      saveSessionState();
+    }
     return;
   }
   render();
@@ -2418,6 +2435,9 @@ elements.canvas.addEventListener('pointerdown', event => {
   if (!originalImage || isBusy) {
     return;
   }
+  if (event.pointerType !== 'touch' && event.button !== 0) {
+    return;
+  }
   if (event.pointerType === 'touch') {
     activeTouchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
   }
@@ -2459,6 +2479,19 @@ elements.canvas.addEventListener('pointerdown', event => {
     render();
     return;
   }
+  if (event.pointerType === 'mouse' && !isMobileLayout() && !hasCoarsePointer() && canPanZoomedCanvas()) {
+    dragState = {
+      type: 'pan',
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startScrollLeft: elements.canvasWrap.scrollLeft,
+      startScrollTop: elements.canvasWrap.scrollTop,
+      moved: false
+    };
+    elements.canvas.style.cursor = 'grabbing';
+    event.preventDefault();
+    return;
+  }
   selectedId = null;
   dragState = null;
   updateBoxList();
@@ -2482,13 +2515,28 @@ elements.canvas.addEventListener('pointermove', event => {
   if (dragState && typeof activeDragPointerId === 'number' && event.pointerId !== activeDragPointerId) {
     return;
   }
+  if (dragState?.type === 'pan') {
+    const deltaX = event.clientX - dragState.startClientX;
+    const deltaY = event.clientY - dragState.startClientY;
+    dragState.moved = dragState.moved || Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2;
+    elements.canvasWrap.scrollLeft = dragState.startScrollLeft - deltaX;
+    elements.canvasWrap.scrollTop = dragState.startScrollTop - deltaY;
+    event.preventDefault();
+    return;
+  }
   const canvasPoint = imageToCanvasPoint(event.clientX, event.clientY);
   if (event.pointerType === 'touch' && !dragState) {
     return;
   }
   const nextHandle = findHandle(canvasPoint);
   const nextHoveredShape = nextHandle ? nextHandle.shape : findShape(canvasPoint);
-  elements.canvas.style.cursor = nextHandle ? 'grab' : nextHoveredShape ? 'move' : 'default';
+  elements.canvas.style.cursor = nextHandle
+    ? 'grab'
+    : nextHoveredShape
+      ? 'move'
+      : event.pointerType !== 'touch' && !isMobileLayout() && !hasCoarsePointer() && canPanZoomedCanvas()
+        ? 'grab'
+        : 'default';
   if (!dragState) {
     const handleChanged = !sameHandle(nextHandle, hoverHandle);
     const shapeChanged = !sameShape(nextHoveredShape, hoveredShape);
