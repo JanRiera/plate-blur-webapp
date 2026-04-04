@@ -2676,6 +2676,19 @@ elements.canvas.addEventListener('pointerdown', event => {
   }
   isDragging = true;
   activeDragPointerId = event.pointerId;
+  const shouldPanTouchCanvas = event.pointerType === 'touch' && canPanZoomedCanvas();
+  if (shouldPanTouchCanvas) {
+    dragState = {
+      type: 'pan',
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startScrollLeft: elements.canvasWrap.scrollLeft,
+      startScrollTop: elements.canvasWrap.scrollTop,
+      moved: false
+    };
+    event.preventDefault();
+    return;
+  }
   const canvasPoint = imageToCanvasPoint(event.clientX, event.clientY);
   const handle = findHandle(canvasPoint);
   if (handle) {
