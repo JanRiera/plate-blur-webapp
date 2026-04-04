@@ -13,7 +13,10 @@
   <main class="wrap">
     <header class="app-header">
       <div class="app-topbar">
-        <h1 data-i18n="appTitle">Plate Blur Prototype</h1>
+        <div class="header-title-group">
+          <h1 data-i18n="appTitle">Plate Blur Prototype</h1>
+          <p class="status-banner" id="status" aria-live="polite" data-tone="info" data-i18n="statusSelectPhoto">Select a photo to begin.</p>
+        </div>
         <div class="preferences-panel">
           <div class="setting-group">
             <span class="setting-label" data-i18n="theme">Theme</span>
@@ -84,7 +87,6 @@
           </div>
         </div>
       </div>
-      <p class="status-banner" id="status" aria-live="polite" data-tone="info" data-i18n="statusSelectPhoto">Select a photo to begin.</p>
     </header>
 
     <section class="photo-bar">
@@ -255,7 +257,3 @@
   <script type="module" src="./app.js"></script>
 </body>
 </html>
-
-<script>
-
-</script>
