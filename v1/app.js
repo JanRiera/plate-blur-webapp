@@ -9,7 +9,7 @@ const translations = {
     autoDetectAll: 'Auto Detect All',
     addBox: 'Add Box',
     clearBoxes: 'Clear All Boxes',
-    deleteBox: 'Clear Selected Box',
+    deleteBox: 'Clear Box',
     saveCopy: 'Save Copy',
     saveAll: 'Save All',
     previous: 'Previous',
@@ -82,7 +82,7 @@ const translations = {
     autoDetectAll: 'すべて自動検出',
     addBox: 'ボックスを追加',
     clearBoxes: 'すべてのボックスを削除',
-    deleteBox: '選択したボックスを削除',
+    deleteBox: 'ボックスを削除',
     saveCopy: 'コピーを保存',
     saveAll: 'すべて保存',
     previous: '前へ',
@@ -155,7 +155,7 @@ const translations = {
     autoDetectAll: 'Detectar todas',
     addBox: 'Añadir cuadro',
     clearBoxes: 'Borrar todos los cuadros',
-    deleteBox: 'Borrar cuadro seleccionado',
+    deleteBox: 'Borrar cuadro',
     saveCopy: 'Guardar copia',
     saveAll: 'Guardar todo',
     previous: 'Anterior',
@@ -228,7 +228,7 @@ const translations = {
     autoDetectAll: 'Rileva tutte',
     addBox: 'Aggiungi riquadro',
     clearBoxes: 'Cancella tutti i riquadri',
-    deleteBox: 'Cancella il riquadro selezionato',
+    deleteBox: 'Cancella riquadro',
     saveCopy: 'Salva copia',
     saveAll: 'Salva tutto',
     previous: 'Precedente',
@@ -795,6 +795,26 @@ function updateStaticText() {
   updateBoxList();
   refreshStatus();
 }
+  // Show/hide canvas-meta depending on photoPositionBadge content
+  function updateCanvasMetaVisibility() {
+    var badge = document.getElementById('photoPositionBadge');
+    var meta = document.getElementById('canvasMeta');
+    if (!badge || !meta) return;
+    if (badge.textContent.trim() !== '') {
+      meta.style.display = '';
+    } else {
+      meta.style.display = 'none';
+    }
+  }
+  // Optionally, observe changes to the badge
+  const badgeObserver = new MutationObserver(updateCanvasMetaVisibility);
+  const badgeEl = document.getElementById('photoPositionBadge');
+  if (badgeEl) {
+    badgeObserver.observe(badgeEl, { childList: true, characterData: true, subtree: true });
+  }
+  // Initial check
+  updateCanvasMetaVisibility();
+
 
 function setLanguage(languageCode) {
   currentLanguage = normalizeLanguageCode(languageCode);

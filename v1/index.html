@@ -89,7 +89,7 @@
 
     <section class="photo-bar">
       <div class="photo-bar-actions">
-        <label class="file-picker" for="photoInput">
+        <label class="file-picker photo-bar-action-control" for="photoInput">
           <span class="button-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 16V6"></path>
@@ -100,7 +100,7 @@
           <span data-i18n="uploadPhotos">Choose Photos</span>
         </label>
         <input id="photoInput" class="visually-hidden" type="file" accept="image/*" multiple />
-        <button id="removePhotoBtn" class="icon-button danger-button" type="button" disabled>
+        <button id="removePhotoBtn" class="icon-button danger-button photo-bar-action-control" type="button" disabled>
           <span class="button-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4.5 7.5h15"></path>
@@ -113,8 +113,28 @@
           </span>
           <span data-i18n="removePhoto">Remove Photo</span>
         </button>
-        <button id="saveBtn" type="button" disabled data-i18n="saveCopy">Save Copy</button>
-        <button id="saveAllBtn" type="button" disabled data-i18n="saveAll">Save All</button>
+        <button id="saveBtn" class="icon-button photo-bar-action-control" type="button" disabled>
+          <span class="button-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5.5 4.5h10l3 3v12h-13z"></path>
+              <path d="M8 4.5v5h7v-5"></path>
+              <path d="M8 16h8"></path>
+              <path d="M9.5 13.5h5"></path>
+            </svg>
+          </span>
+          <span data-i18n="saveCopy">Save Copy</span>
+        </button>
+        <button id="saveAllBtn" class="icon-button photo-bar-action-control" type="button" disabled>
+          <span class="button-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5.5 4.5h10l3 3v12h-13z"></path>
+              <path d="M8 4.5v5h7v-5"></path>
+              <path d="M8 16h8"></path>
+              <path d="M9.5 13.5h5"></path>
+            </svg>
+          </span>
+          <span data-i18n="saveAll">Save All</span>
+        </button>
       </div>
       <div class="photo-bar-summary">
         <span class="photo-bar-label" data-i18n="groupPhotos">Photos</span>
@@ -137,7 +157,7 @@
             </svg>
             <span class="visually-hidden" data-i18n="next">Next</span>
           </button>
-          <div class="canvas-meta">
+          <div class="canvas-meta" id="canvasMeta" style="display:none;">
             <span class="canvas-badge" id="photoPositionBadge" hidden></span>
           </div>
           <div class="canvas-wrap" id="canvasWrap">
@@ -221,7 +241,7 @@
                     <path d="M6 7.5l1 12h10l1-12"></path>
                   </svg>
                 </span>
-                <span data-i18n="deleteBox">Clear Selected Box</span>
+                <span data-i18n="deleteBox">Clear Box</span>
               </button>
               <button id="clearBoxesBtn" type="button" disabled data-i18n="clearBoxes">Clear All Boxes</button>
             </div>
@@ -235,3 +255,7 @@
   <script type="module" src="./app.js"></script>
 </body>
 </html>
+
+<script>
+
+</script>

@@ -387,6 +387,28 @@ html[data-theme="dark"] .theme-icon-moon {
   flex: 1 1 420px;
 }
 
+@media (min-width: 821px) {
+  .photo-bar-action-control {
+    width: 184px;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  .photo-bar-actions #saveBtn,
+  .photo-bar-actions #saveAllBtn {
+    background: var(--button-background);
+    border-color: var(--button-border);
+    color: var(--button-text);
+  }
+
+  .photo-bar-actions #saveBtn:hover:not(:disabled),
+  .photo-bar-actions #saveAllBtn:hover:not(:disabled) {
+    background: var(--button-hover);
+    border-color: var(--accent-color);
+    color: var(--button-text);
+  }
+}
+
 .photo-bar-summary {
   display: flex;
   flex-direction: column;
