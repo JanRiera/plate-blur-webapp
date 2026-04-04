@@ -4,8 +4,11 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "android:prebuild": "expo prebuild --platform android --no-install",
+    "android:clean": "expo prebuild --platform android --clean --no-install",
+    "ios": "expo run:ios",
+    "ios:prebuild": "expo prebuild --platform ios --no-install",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit"
   },
