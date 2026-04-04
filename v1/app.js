@@ -1244,6 +1244,15 @@ function endPinchGesture() {
   pinchState = null;
 }
 
+function getWheelZoomFactor(wheelEvent) {
+  const deltaMultiplier = wheelEvent.deltaMode === WheelEvent.DOM_DELTA_LINE
+    ? 16
+    : wheelEvent.deltaMode === WheelEvent.DOM_DELTA_PAGE
+      ? 120
+      : 1;
+  return Math.exp((-wheelEvent.deltaY * deltaMultiplier) / 900);
+}
+
 function polygonPath(context, pointList, scale = 1) {
   context.beginPath();
   context.moveTo(pointList[0].x * scale, pointList[0].y * scale);
@@ -2368,6 +2377,24 @@ elements.zoomSlider.addEventListener('input', () => {
     anchorImagePoint: clampImagePoint(imageToCanvasPoint(anchorPoint.x, anchorPoint.y))
   });
 });
+
+elements.canvasWrap.addEventListener('wheel', event => {
+  if (!originalImage || isBusy || isMobileLayout() || hasCoarsePointer()) {
+    return;
+  }
+  event.preventDefault();
+  const nextZoomValue = Number(elements.zoomSlider.value) * getWheelZoomFactor(event);
+  const anchorPoint = {
+    x: event.clientX,
+    y: event.clientY
+  };
+  setZoomValue(nextZoomValue, {
+    anchorClientX: anchorPoint.x,
+    anchorClientY: anchorPoint.y,
+    anchorImagePoint: clampImagePoint(imageToCanvasPoint(anchorPoint.x, anchorPoint.y))
+  });
+}, { passive: false });
+
 window.addEventListener('resize', fitToViewport);
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', fitToViewport);
