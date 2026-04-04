@@ -611,8 +611,11 @@ function applyTheme() {
 }
 
 function updateThemeToggle() {
+  const themeLabel = translate(currentTheme === 'dark' ? 'themeDark' : 'themeLight');
   elements.themeToggle.setAttribute('aria-pressed', currentTheme === 'dark' ? 'true' : 'false');
-  elements.themeToggleText.textContent = translate(currentTheme === 'dark' ? 'themeDark' : 'themeLight');
+  elements.themeToggle.setAttribute('aria-label', `${translate('theme')}: ${themeLabel}`);
+  elements.themeToggle.title = `${translate('theme')}: ${themeLabel}`;
+  elements.themeToggleText.textContent = themeLabel;
 }
 
 function refreshStatus() {
@@ -655,7 +658,7 @@ function getHandleDrawRadius(isSelected) {
 }
 
 function setupPrimaryActionRestoreSlots() {
-  [elements.autoDetect, elements.addBox, elements.save].forEach(button => {
+  [elements.autoDetect, elements.autoDetectAll, elements.deleteBox, elements.saveAll].forEach(button => {
     if (!button?.parentNode || primaryActionRestoreSlots.has(button.id)) {
       return;
     }
@@ -677,7 +680,7 @@ function syncMobilePrimaryActions() {
   if (!elements.mobilePrimaryActions) {
     return;
   }
-  const primaryButtons = [elements.autoDetect, elements.addBox, elements.save];
+  const primaryButtons = [elements.autoDetect, elements.autoDetectAll, elements.deleteBox, elements.saveAll];
   if (isMobileLayout()) {
     primaryButtons.forEach(button => {
       elements.mobilePrimaryActions.appendChild(button);

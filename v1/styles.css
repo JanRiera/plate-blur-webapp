@@ -841,19 +841,67 @@ body[data-busy="true"] .file-picker {
     width: 100%;
   }
 
+  .preferences-panel {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-content: stretch;
+    gap: 10px;
+  }
+
+  .preferences-panel .setting-group {
+    display: block;
+    position: relative;
+    width: auto;
+  }
+
+  .preferences-panel .setting-group-language {
+    min-width: 0;
+  }
+
+  .preferences-panel .setting-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .preferences-panel .theme-toggle {
+    width: auto;
+    min-width: 0;
+    padding: 8px;
+    gap: 0;
+    justify-content: center;
+  }
+
+  .preferences-panel .theme-toggle-text {
+    display: none;
+  }
+
+  .preferences-panel .theme-toggle-icons {
+    gap: 5px;
+  }
+
+  .preferences-panel .language-menu {
+    min-width: 0;
+    width: 100%;
+  }
+
   .photo-bar-actions {
     flex: 0 0 auto;
     align-content: flex-start;
   }
 
-  .setting-group,
   .photo-bar-actions > * {
     width: 100%;
   }
 
   .language-menu,
   .language-menu-button,
-  .theme-toggle,
   .file-picker,
   .icon-button,
   .photo-bar-actions button,
@@ -901,14 +949,14 @@ body[data-busy="true"] .file-picker {
   }
 
   body[data-mobile-actions="true"] .workspace-column {
-    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    padding-bottom: calc(150px + env(safe-area-inset-bottom));
   }
 
   body[data-mobile-actions="true"] .mobile-primary-actions {
     position: sticky;
     bottom: max(12px, env(safe-area-inset-bottom));
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: -2px;
   }
 
@@ -916,6 +964,18 @@ body[data-busy="true"] .file-picker {
     font-size: 13.5px;
     padding-inline: 10px;
     line-height: 1.2;
+  }
+
+  body[data-mobile-actions="true"] .mobile-primary-actions button {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #ffffff;
+  }
+
+  body[data-mobile-actions="true"] .mobile-primary-actions button:hover:not(:disabled) {
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
+    color: #ffffff;
   }
 }
 
@@ -1046,7 +1106,7 @@ body[data-busy="true"] .file-picker {
   }
 
   body[data-mobile-actions="true"] .mobile-primary-actions {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 8px;
   }
 
